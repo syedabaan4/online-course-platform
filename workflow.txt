@@ -34,3 +34,113 @@ Members: Syed Abaan - 22984 (only one member)
                          (Member 3)
 ================================================================================
 
+--- Workflow Specification (Textual Description) ---
+
+This workflow covers the process of a student taking quizzes within a
+course, receiving grades and feedback, and earning a certificate upon course
+completion. As the student progresses through course modules and completes
+lectures, they encounter quizzes at the end of each module. The student
+starts a quiz, answers all multiple-choice questions, and submits it for
+grading. The system automatically evaluates the answers, calculates the
+score, and presents the results with a breakdown showing which questions
+were correct and which were wrong. If the student achieves the passing
+score, the module quiz is marked as passed; otherwise, the student may
+reattempt the quiz. Once the student has completed all lectures and passed
+all module quizzes in a course, the system recognizes the course as fully
+completed. The student can then generate a certificate of completion which
+is displayed on screen with their name, course title, completion date, and
+a unique certificate ID, and can be downloaded as a PDF.
+
+--- Workflow Description (Step-by-Step) ---
+
+Step 1: Navigating to a Module Quiz
+   - The student is progressing through a course and has completed the
+     video lectures within a module.
+   - At the end of the module, the sidebar displays a "Module Quiz" item.
+   - The student clicks on the quiz to open the quiz information page.
+   - The quiz information page displays: quiz title, number of questions,
+     and the passing score requirement (e.g., 70%).
+   - The student clicks "Start Quiz" to begin the attempt.
+
+Step 2: Answering Quiz Questions
+   - The system loads the quiz interface displaying all questions on the
+     page.
+   - For each multiple-choice question, the student selects one answer from
+     the provided options by clicking the corresponding radio button.
+   - A counter shows how many questions have been answered out of the total
+     (e.g., "5 of 10 answered").
+   - The student works through all questions at their own pace.
+
+Step 3: Submitting the Quiz
+   - After answering all questions, the student clicks "Submit Quiz."
+   - A confirmation dialog appears: "Are you sure you want to submit?"
+   - The student confirms, and the system accepts the submission for
+     grading.
+
+Step 4: Automated Grading & Score Calculation
+   - The system compares each submitted answer against the correct answer
+     stored in the database.
+   - The system calculates: total correct answers, total incorrect answers,
+     and the overall score as a percentage.
+   - The system determines whether the student has passed or failed based
+     on the passing score threshold set by the instructor.
+
+Step 5: Viewing Quiz Results & Feedback
+   - The system displays the results page showing: the student's score
+     (e.g., "8 out of 10 — 80%") and pass/fail status highlighted in
+     green for pass or red for fail.
+   - Below the summary, a question-by-question breakdown is shown:
+     * Each question is listed with the student's selected answer and the
+       correct answer.
+     * Correctly answered questions are marked with a green checkmark.
+     * Incorrectly answered questions are marked with a red cross, and the
+       correct answer is revealed.
+   - The student reviews this feedback to understand their mistakes.
+
+Step 6: Reattempting a Failed Quiz
+   - If the student did not achieve the passing score, a "Retake Quiz"
+     button is displayed on the results page.
+   - The student clicks "Retake Quiz" to start a new attempt.
+   - The student goes through the same process of answering and submitting.
+   - The system stores the latest attempt's score.
+   - The student can reattempt the quiz as many times as needed until they
+     pass.
+
+Step 7: Course Completion Check
+   - As the student passes each module quiz and marks all lectures as
+     complete, the system tracks overall course progress.
+   - The system checks two conditions for course completion:
+     * All video lectures across all modules are marked as complete.
+     * All module quizzes have been passed (score >= passing threshold).
+   - Once both conditions are met, the system updates the course status
+     to "Completed" on the student's dashboard.
+   - A congratulatory message is shown: "Congratulations! You have
+     completed [Course Title]!"
+
+Step 8: Certificate Generation & Download
+   - On the completed course page, a "Get Certificate" button becomes
+     available.
+   - The student clicks "Get Certificate."
+   - The system generates a certificate containing:
+     * The student's full name.
+     * The course title.
+     * The instructor's name.
+     * The date of completion.
+     * A unique Certificate ID (e.g., CERT-2025-XXXXXX).
+   - The certificate is displayed on screen as a styled certificate view.
+   - The student clicks "Download PDF" to save the certificate as a PDF
+     file to their device.
+   - The certificate is also stored in the student's profile under a
+     "My Certificates" section, so they can access it again at any time.
+
+--- Key Features & Functionalities ---
+
+   - Module-end quizzes with multiple-choice questions
+   - Automated grading with instant score calculation
+   - Pass/fail determination based on instructor-set threshold
+   - Detailed results with question-by-question feedback
+   - Quiz reattempt functionality for failed attempts
+   - Automatic course completion detection (lectures + quizzes)
+   - Certificate generation with student name, course, date, and unique ID
+   - Certificate download as PDF
+   - Persistent certificate storage in student profile
