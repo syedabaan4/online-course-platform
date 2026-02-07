@@ -107,6 +107,106 @@ Step 6: Tracking Progress & Resuming
                          (Member 2)
 ================================================================================
 
+--- Workflow Specification (Textual Description) ---
+
+This workflow describes how an instructor creates a course and manages it
+over time. An authenticated instructor accesses the instructor dashboard
+which shows a summary of their created courses and enrolled student counts.
+From there, the instructor creates a new course by filling in the course
+title, description, category, and difficulty level. The instructor then
+organizes the course into modules, and adds video lectures to each module by
+providing a title, description, and video URL. The instructor can also
+attach supplementary resources such as PDFs and slides to each lecture.
+Additionally, the instructor creates quizzes for each module by adding
+multiple-choice questions and setting a passing score. Once all content is
+added, the instructor publishes the course to make it visible to students in
+the catalog. After publication, the instructor can view basic enrollment
+statistics, update course content, and edit quiz questions.
+
+--- Workflow Description (Step-by-Step) ---
+
+Step 1: Accessing the Instructor Dashboard
+   - The instructor navigates to their dashboard.
+   - The dashboard displays: a list of their created courses, the number of
+     enrolled students per course, and overall course status (draft or
+     published).
+   - The instructor clicks "Create New Course" to begin.
+
+Step 2: Entering Course Information
+   - The system presents a course creation form.
+   - The instructor fills in: course title, course description, category
+     (e.g., Web Development, Data Science, Graphic Design), and difficulty
+     level (Beginner, Intermediate, Advanced).
+   - The instructor optionally uploads a course thumbnail image.
+   - The instructor clicks "Save & Continue" to proceed to adding content.
+
+Step 3: Creating Modules
+   - The system displays a course content builder page.
+   - The instructor clicks "Add Module" to create a new module/section.
+   - For each module, the instructor enters a module title and a brief
+     description.
+   - The instructor can add multiple modules to organize the course
+     logically (e.g., Module 1: Introduction, Module 2: Core Concepts).
+   - Modules are displayed in the order they are added; the instructor can
+     change the order number to rearrange them.
+
+Step 4: Adding Video Lectures to Modules
+   - Within each module, the instructor clicks "Add Lecture."
+   - For each lecture, the instructor provides: a lecture title, a brief
+     description, and a video URL (e.g., a link to an uploaded video file
+     or an external video hosting service).
+   - The instructor can add multiple lectures per module.
+   - Lectures appear in order within their module; the instructor can
+     adjust the order number as needed.
+
+Step 5: Attaching Supplementary Resources
+   - For each lecture, the instructor can click "Add Resource."
+   - The instructor uploads a file (PDF, slides, or code files) and gives
+     it a descriptive title.
+   - Each resource is associated with the specific lecture it belongs to.
+   - Students will be able to download these resources when viewing the
+     lecture.
+
+Step 6: Creating Quizzes for Modules
+   - Within each module, the instructor clicks "Add Quiz."
+   - The instructor provides a quiz title and sets a passing score
+     percentage (e.g., 70%).
+   - The instructor adds questions one by one. For each question:
+     * The instructor types the question text.
+     * The instructor adds 2 to 4 answer options.
+     * The instructor marks which option is the correct answer.
+   - The instructor can add as many questions as needed.
+   - The instructor saves the quiz, and it is linked to the module.
+
+Step 7: Publishing the Course
+   - After adding all modules, lectures, resources, and quizzes, the
+     instructor clicks "Publish Course."
+   - The system checks that the course has at least one module with at
+     least one lecture before allowing publication.
+   - Upon publishing, the course status changes from "Draft" to "Published"
+     and the course becomes visible in the student course catalog.
+
+Step 8: Managing the Course After Publication
+   - The instructor can view basic statistics from the dashboard: total
+     number of students enrolled in each course.
+   - The instructor can edit existing course content at any time:
+     * Update the course title, description, or category.
+     * Add new modules or lectures.
+     * Edit or delete existing quiz questions.
+     * Upload additional resources.
+   - Changes are reflected immediately for enrolled students.
+
+--- Key Features & Functionalities ---
+
+   - Instructor dashboard with course list and enrollment counts
+   - Course creation form with title, description, category, difficulty
+   - Module-based course organization with ordering
+   - Video lecture addition via URL with title and description
+   - Supplementary resource file upload per lecture
+   - Quiz builder with multiple-choice questions and passing score
+   - Course publishing with basic validation
+   - Post-publication course editing and content updates
+   - Basic enrollment statistics per course
 
 
 ================================================================================
