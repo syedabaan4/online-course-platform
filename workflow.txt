@@ -19,6 +19,87 @@ Members: Syed Abaan - 22984 (only one member)
 ================================================================================
 
 
+--- Workflow Specification (Textual Description) ---
+
+This workflow covers the student's journey of discovering courses, enrolling
+in them, and actively learning. An authenticated student navigates to the
+course catalog where they can browse all available courses, search by
+keywords, and filter by category or difficulty level. The student can view a
+detailed course page showing the syllabus, instructor name, course
+description, and list of modules. When the student finds a course they want,
+they enroll in it. After enrollment, the student accesses the course player
+where they can watch video lectures module by module, download supplementary
+resources (PDFs, slides, code files), and mark lectures as complete. The
+system tracks the student's progress with a completion percentage so they
+can resume learning at any time from where they left off.
+
+--- Workflow Description (Step-by-Step) ---
+
+Step 1: Browsing the Course Catalog
+   - The student navigates to the "Browse Courses" page from the dashboard.
+   - The system displays a catalog of all available courses as cards showing
+     the course thumbnail, title, instructor name, and category.
+   - The student can use the search bar to search by course title or keyword.
+   - The student can apply filters: category (e.g., Programming, Design,
+     Business) and difficulty level (Beginner, Intermediate, Advanced).
+   - The filtered or searched results update on the page accordingly.
+
+Step 2: Viewing Course Details
+   - The student clicks on a course card to view the full course detail page.
+   - The course detail page displays: course title, detailed description,
+     instructor name, course category, difficulty level, total number of
+     modules and lectures, and a full syllabus listing all module titles
+     and their lecture titles.
+   - The student reviews this information to decide whether to enroll.
+
+Step 3: Enrolling in a Course
+   - The student clicks the "Enroll Now" button on the course detail page.
+   - The system enrolls the student and displays a success confirmation
+     message.
+   - The enrolled course now appears in the student's "My Courses" section
+     on their dashboard.
+   - The student can enroll in multiple courses simultaneously.
+
+Step 4: Accessing Course Content & Watching Lectures
+   - The student navigates to "My Courses" and clicks on an enrolled course.
+   - The system displays the course player interface with: a video player in
+     the main area, and a sidebar listing all modules and their lectures
+     with checkmarks indicating completion status.
+   - The student clicks on a lecture to begin watching the video.
+   - The student can pause, play, rewind, and fast-forward the video using
+     standard HTML5 video controls.
+   - After finishing a lecture, the student clicks "Mark as Complete" to
+     update their progress.
+
+Step 5: Downloading Resources
+   - Below the video player, the student can see a "Resources" section
+     listing all downloadable files attached to the current lecture (PDFs,
+     slides, code files, etc.).
+   - The student clicks the download button next to a resource to save it
+     locally.
+
+Step 6: Tracking Progress & Resuming
+   - A progress bar at the top of the course player shows the student's
+     overall course completion percentage (based on how many lectures are
+     marked complete out of the total).
+   - The student's progress is saved automatically in the database.
+   - When the student returns later, they go to "My Courses" and click
+     "Continue Learning." The system takes them directly to the first
+     incomplete lecture.
+   - The dashboard shows all enrolled courses with their respective
+     completion percentages at a glance.
+
+--- Key Features & Functionalities ---
+
+   - Course catalog with search and filter (by category, difficulty)
+   - Detailed course pages with full syllabus
+   - One-click course enrollment
+   - Video lecture player with standard playback controls
+   - Module and lecture sidebar with completion indicators
+   - Downloadable supplementary resources per lecture
+   - Progress tracking with visual completion percentage
+   - Resume learning from last incomplete lecture
+
 
 ================================================================================
                          WORKFLOW 2
