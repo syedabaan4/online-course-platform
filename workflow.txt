@@ -1,0 +1,36 @@
+================================================================================
+                        ONLINE COURSE PLATFORM
+                      Workflow Specification Document
+================================================================================
+
+Project Description:
+Online Course Platform where instructors can create and manage courses with
+video lectures, quizzes, and resources, and students can enroll, learn at
+their own pace, and earn certificates.
+
+Note: User authentication (registration, login, signup) is assumed to be a
+given and is not included in these workflow descriptions.
+
+Members: Syed Abaan - 22984 (only one member)
+================================================================================
+                         WORKFLOW 1
+             Course Browsing, Enrollment & Learning
+             (Member 1 - Group Leader - Syed Abaan)
+================================================================================
+
+
+
+================================================================================
+                         WORKFLOW 2
+            Instructor Course Creation & Management
+                         (Member 2)
+================================================================================
+
+
+
+================================================================================
+                         WORKFLOW 3
+          Quiz Attempt, Grading & Certificate Generation
+                         (Member 3)
+================================================================================
+
