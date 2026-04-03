@@ -7,7 +7,7 @@ async function createResource(lectureId, data, instructorId) {
 	});
 
 	if (!lecture) {
-		throw new Error('Unauthorized');
+		throw new Error('Lecture not found');
 	}
 
 	const module = await prisma.module.findUnique({
@@ -16,7 +16,7 @@ async function createResource(lectureId, data, instructorId) {
 	});
 
 	if (!module) {
-		throw new Error('Unauthorized');
+		throw new Error('Module not found');
 	}
 
 	const course = await prisma.course.findUnique({
@@ -24,7 +24,11 @@ async function createResource(lectureId, data, instructorId) {
 		select: { instructorId: true },
 	});
 
-	if (!course || course.instructorId !== instructorId) {
+	if (!course) {
+		throw new Error('Course not found');
+	}
+
+	if (course.instructorId !== instructorId) {
 		throw new Error('Unauthorized');
 	}
 
@@ -51,7 +55,7 @@ async function deleteResource(id, instructorId) {
 	});
 
 	if (!resource) {
-		throw new Error('Unauthorized');
+		throw new Error('Resource not found');
 	}
 
 	const lecture = await prisma.lecture.findUnique({
@@ -60,7 +64,7 @@ async function deleteResource(id, instructorId) {
 	});
 
 	if (!lecture) {
-		throw new Error('Unauthorized');
+		throw new Error('Lecture not found');
 	}
 
 	const module = await prisma.module.findUnique({
@@ -69,7 +73,7 @@ async function deleteResource(id, instructorId) {
 	});
 
 	if (!module) {
-		throw new Error('Unauthorized');
+		throw new Error('Module not found');
 	}
 
 	const course = await prisma.course.findUnique({
@@ -77,7 +81,11 @@ async function deleteResource(id, instructorId) {
 		select: { instructorId: true },
 	});
 
-	if (!course || course.instructorId !== instructorId) {
+	if (!course) {
+		throw new Error('Course not found');
+	}
+
+	if (course.instructorId !== instructorId) {
 		throw new Error('Unauthorized');
 	}
 
