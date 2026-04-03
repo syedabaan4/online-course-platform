@@ -9,7 +9,7 @@ app.use(express.json());
 app.use('/api/auth', require('./routes/auth.routes'));
 app.use('/api/courses', require('./routes/course.routes'));
 app.use('/api/modules', require('./routes/module.routes'));
-// app.use('/api/lectures', require('./routes/lecture.routes'));
+app.use('/api/lectures', require('./routes/lecture.routes'));
 // app.use('/api/resources', require('./routes/resource.routes'));
 // app.use('/api/enrollments', require('./routes/enrollment.routes'));
 // app.use('/api/progress', require('./routes/progress.routes'));
