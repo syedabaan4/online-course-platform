@@ -1,0 +1,200 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  STUDENT
+  INSTRUCTOR
+}
+
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum CourseStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  name         String
+  email        String        @unique
+  password     String
+  role         Role          @default(STUDENT)
+  createdAt    DateTime      @default(now())
+
+  // Relations
+  courses      Course[]      // courses created (if instructor)
+  enrollments  Enrollment[]
+  progress     LectureProgress[]
+  quizAttempts QuizAttempt[]
+  certificates Certificate[]
+}
+
+model Course {
+  id           Int          @id @default(autoincrement())
+  title        String
+  description  String
+  category     String
+  difficulty   Difficulty
+  thumbnailUrl String?
+  status       CourseStatus @default(DRAFT)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  instructor   User         @relation(fields: [instructorId], references: [id])
+  instructorId Int
+
+  modules      Module[]
+  enrollments  Enrollment[]
+  certificates Certificate[]
+}
+
+model Module {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String?
+  order       Int
+  createdAt   DateTime  @default(now())
+
+  course      Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  courseId    Int
+
+  lectures    Lecture[]
+  quiz        Quiz?
+}
+
+model Lecture {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String?
+  videoUrl    String
+  order       Int
+  createdAt   DateTime  @default(now())
+
+  module      Module    @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  moduleId    Int
+
+  resources   Resource[]
+  progress    LectureProgress[]
+}
+
+model Resource {
+  id        Int      @id @default(autoincrement())
+  title     String
+  fileUrl   String
+  createdAt DateTime @default(now())
+
+  lecture   Lecture  @relation(fields: [lectureId], references: [id], onDelete: Cascade)
+  lectureId Int
+}
+
+model Enrollment {
+  id         Int      @id @default(autoincrement())
+  enrolledAt DateTime @default(now())
+
+  student    User     @relation(fields: [studentId], references: [id])
+  studentId  Int
+
+  course     Course   @relation(fields: [courseId], references: [id])
+  courseId   Int
+
+  @@unique([studentId, courseId])
+}
+
+model LectureProgress {
+  id         Int      @id @default(autoincrement())
+  isComplete Boolean  @default(false)
+  updatedAt  DateTime @updatedAt
+
+  student    User     @relation(fields: [studentId], references: [id])
+  studentId  Int
+
+  lecture    Lecture  @relation(fields: [lectureId], references: [id])
+  lectureId  Int
+
+  @@unique([studentId, lectureId])
+}
+
+model Quiz {
+  id           Int       @id @default(autoincrement())
+  title        String
+  passingScore Int       // percentage e.g. 70
+
+  module       Module    @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  moduleId     Int       @unique
+
+  questions    Question[]
+  attempts     QuizAttempt[]
+}
+
+model Question {
+  id      Int            @id @default(autoincrement())
+  text    String
+
+  quiz    Quiz           @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  quizId  Int
+
+  options AnswerOption[]
+  attemptAnswers QuizAttemptAnswer[]
+}
+
+model AnswerOption {
+  id         Int      @id @default(autoincrement())
+  text       String
+  isCorrect  Boolean  @default(false)
+
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  questionId Int
+
+  attemptAnswers QuizAttemptAnswer[]
+}
+
+model QuizAttempt {
+  id        Int      @id @default(autoincrement())
+  score     Float
+  passed    Boolean
+  createdAt DateTime @default(now())
+
+  student   User     @relation(fields: [studentId], references: [id])
+  studentId Int
+
+  quiz      Quiz     @relation(fields: [quizId], references: [id])
+  quizId    Int
+
+  answers   QuizAttemptAnswer[]
+}
+
+model QuizAttemptAnswer {
+  id         Int          @id @default(autoincrement())
+
+  attempt    QuizAttempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  attemptId  Int
+
+  question   Question     @relation(fields: [questionId], references: [id])
+  questionId Int
+
+  selected   AnswerOption @relation(fields: [selectedOptionId], references: [id])
+  selectedOptionId Int
+}
+
+model Certificate {
+  id            Int      @id @default(autoincrement())
+  certificateId String   @unique // e.g. CERT-2025-XXXXXX
+  issuedAt      DateTime @default(now())
+
+  student       User     @relation(fields: [studentId], references: [id])
+  studentId     Int
+
+  course        Course   @relation(fields: [courseId], references: [id])
+  courseId      Int
+
+  @@unique([studentId, courseId])
+}
