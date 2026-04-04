@@ -1,4 +1,6 @@
 const prisma = require('../prisma');
+const { runCompletionWatcher } = require('./completion.watcher');
+
 
 function validateOptions(options) {
 	if (!Array.isArray(options) || options.length < 2 || options.length > 4) {
@@ -321,6 +323,18 @@ async function submitQuizAttempt(quizId, studentId, answers) {
 		};
 	});
 
+    let completionStatus = null;
+    if (passed) {
+
+    const quizWithModule = await prisma.quiz.findUnique({
+        where: { id: quizId },
+        include: { module: { select: { courseId: true } } }
+    });
+    if (quizWithModule?.module?.courseId) {
+        completionStatus = await runCompletionWatcher(studentId, quizWithModule.module.courseId);
+    }
+    }
+
 	return {
 		score,
 		passed,
@@ -328,6 +342,7 @@ async function submitQuizAttempt(quizId, studentId, answers) {
 		totalQuestions,
 		attempt,
 		breakdown,
+        completionStatus
 	};
 }
 

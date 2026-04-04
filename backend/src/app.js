@@ -17,7 +17,7 @@ app.use('/api/resources', require('./routes/resource.routes'));
 app.use('/api/enrollments', require('./routes/enrollment.routes'));
 app.use('/api/progress', require('./routes/progress.routes'));
 app.use('/api/quizzes', require('./routes/quiz.routes'));
-// app.use('/api/certificates', require('./routes/certificate.routes'));
+app.use('/api/certificates', require('./routes/certificate.routes'));
 
 app.use((req, res) => res.status(404).json({ error: 'Route not found' }));
 app.use((err, req, res, next) => {
