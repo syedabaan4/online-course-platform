@@ -1,0 +1,132 @@
+import { Suspense, lazy } from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import InstructorRoute from './components/InstructorRoute';
+import ProtectedRoute from './components/ProtectedRoute';
+import { AuthProvider } from './context/AuthContext';
+
+const Home = lazy(() => import('./pages/Home.jsx'));
+const Login = lazy(() => import('./pages/auth/Login.jsx'));
+const Register = lazy(() => import('./pages/auth/Register.jsx'));
+const CourseCatalog = lazy(() => import('./pages/student/CourseCatalog.jsx'));
+const CourseDetail = lazy(() => import('./pages/student/CourseDetail.jsx'));
+const MyCourses = lazy(() => import('./pages/student/MyCourses.jsx'));
+const CoursePlayer = lazy(() => import('./pages/student/CoursePlayer.jsx'));
+const MyCertificates = lazy(() => import('./pages/student/MyCertificates.jsx'));
+const QuizPlayer = lazy(() => import('./pages/student/QuizPlayer.jsx'));
+const InstructorDashboard = lazy(() => import('./pages/instructor/InstructorDashboard.jsx'));
+const CourseForm = lazy(() => import('./pages/instructor/CourseForm.jsx'));
+const CourseBuilder = lazy(() => import('./pages/instructor/CourseBuilder.jsx'));
+const QuizBuilder = lazy(() => import('./pages/instructor/QuizBuilder.jsx'));
+const NotFound = lazy(() => import('./pages/NotFound.jsx'));
+
+const App = () => {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <Navbar />
+
+        <Suspense
+          fallback={
+            <div
+              style={{
+                minHeight: 'calc(100vh - 64px)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <div className="spinner" />
+            </div>
+          }
+        >
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/courses" element={<CourseCatalog />} />
+            <Route path="/courses/:id" element={<CourseDetail />} />
+
+            <Route
+              path="/my-courses"
+              element={
+                <ProtectedRoute>
+                  <MyCourses />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/learn/:courseId"
+              element={
+                <ProtectedRoute>
+                  <CoursePlayer />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/learn/:courseId/quiz/:quizId"
+              element={
+                <ProtectedRoute>
+                  <QuizPlayer />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/certificates"
+              element={
+                <ProtectedRoute>
+                  <MyCertificates />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/instructor"
+              element={
+                <InstructorRoute>
+                  <InstructorDashboard />
+                </InstructorRoute>
+              }
+            />
+            <Route
+              path="/instructor/courses/new"
+              element={
+                <InstructorRoute>
+                  <CourseForm />
+                </InstructorRoute>
+              }
+            />
+            <Route
+              path="/instructor/courses/:id/edit"
+              element={
+                <InstructorRoute>
+                  <CourseForm />
+                </InstructorRoute>
+              }
+            />
+            <Route
+              path="/instructor/courses/:id/build"
+              element={
+                <InstructorRoute>
+                  <CourseBuilder />
+                </InstructorRoute>
+              }
+            />
+            <Route
+              path="/instructor/courses/:id/quiz/:moduleId"
+              element={
+                <InstructorRoute>
+                  <QuizBuilder />
+                </InstructorRoute>
+              }
+            />
+
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
+      </BrowserRouter>
+    </AuthProvider>
+  );
+};
+
+export default App;
