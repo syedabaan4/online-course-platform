@@ -3,6 +3,16 @@ import CourseCard from '../../components/CourseCard';
 import { getPublishedCourses } from '../../api/course.api';
 import { showError } from '../../components/Toast';
 
+const SEARCH_DEBOUNCE_MS = 350;
+
+const CATALOG_CATEGORIES = [
+	{ value: 'development', label: 'Development' },
+	{ value: 'design', label: 'Design' },
+	{ value: 'business', label: 'Business' },
+	{ value: 'marketing', label: 'Marketing' },
+	{ value: 'data science', label: 'Data science' },
+];
+
 const normalizeList = (payload) => {
 	if (Array.isArray(payload?.data)) {
 		return payload.data;
@@ -16,7 +26,8 @@ const normalizeList = (payload) => {
 const CourseCatalog = () => {
 	const [courses, setCourses] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
-	const [search, setSearch] = useState('');
+	const [searchInput, setSearchInput] = useState('');
+	const [debouncedSearch, setDebouncedSearch] = useState('');
 	const [category, setCategory] = useState('');
 	const [difficulty, setDifficulty] = useState('');
 
@@ -34,22 +45,25 @@ const CourseCatalog = () => {
 	}, []);
 
 	useEffect(() => {
-		fetchCourses({ search: '', category: '', difficulty: '' });
-	}, [fetchCourses]);
+		const t = setTimeout(() => {
+			setDebouncedSearch(searchInput.trim());
+		}, SEARCH_DEBOUNCE_MS);
+		return () => clearTimeout(t);
+	}, [searchInput]);
 
-	const handleApply = () => {
+	useEffect(() => {
 		fetchCourses({
-			search: search.trim(),
-			category: category.trim(),
-			difficulty: difficulty.trim(),
+			search: debouncedSearch,
+			category: category,
+			difficulty: difficulty,
 		});
-	};
+	}, [debouncedSearch, category, difficulty, fetchCourses]);
 
 	const handleReset = () => {
-		setSearch('');
+		setSearchInput('');
+		setDebouncedSearch('');
 		setCategory('');
 		setDifficulty('');
-		fetchCourses({ search: '', category: '', difficulty: '' });
 	};
 
 	return (
@@ -69,7 +83,8 @@ const CourseCatalog = () => {
 					Course Catalog
 				</h1>
 				<p style={{ margin: 0, color: 'var(--text-muted)', fontSize: 16, lineHeight: 1.5 }}>
-					Browse published courses. Search and filter to find what you need.
+					Browse published courses. Search by title, description, category, or instructor. Filters update as you
+					type.
 				</p>
 			</header>
 
@@ -84,7 +99,7 @@ const CourseCatalog = () => {
 					alignItems: 'flex-end',
 				}}
 			>
-				<div style={{ flex: '1 1 200px', minWidth: 0 }}>
+				<div style={{ flex: '1 1 220px', minWidth: 0 }}>
 					<label className="label" htmlFor="cat-search">
 						Search
 					</label>
@@ -92,23 +107,30 @@ const CourseCatalog = () => {
 						id="cat-search"
 						type="search"
 						className="input"
-						placeholder="Search by title"
-						value={search}
-						onChange={(e) => setSearch(e.target.value)}
+						placeholder="Title, topics in description, category, or instructor"
+						value={searchInput}
+						onChange={(e) => setSearchInput(e.target.value)}
+						autoComplete="off"
 					/>
 				</div>
-				<div style={{ flex: '1 1 160px' }}>
+				<div style={{ width: 180 }}>
 					<label className="label" htmlFor="cat-cat">
 						Category
 					</label>
-					<input
+					<select
 						id="cat-cat"
-						type="text"
-						className="input"
-						placeholder="Exact match, e.g. Web Development"
+						className="select"
+						style={{ width: '100%' }}
 						value={category}
 						onChange={(e) => setCategory(e.target.value)}
-					/>
+					>
+						<option value="">All categories</option>
+						{CATALOG_CATEGORIES.map(({ value, label }) => (
+							<option key={value} value={value}>
+								{label}
+							</option>
+						))}
+					</select>
 				</div>
 				<div style={{ width: 180 }}>
 					<label className="label" htmlFor="cat-diff">
@@ -117,6 +139,7 @@ const CourseCatalog = () => {
 					<select
 						id="cat-diff"
 						className="select"
+						style={{ width: '100%' }}
 						value={difficulty}
 						onChange={(e) => setDifficulty(e.target.value)}
 					>
@@ -127,11 +150,8 @@ const CourseCatalog = () => {
 					</select>
 				</div>
 				<div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-					<button type="button" className="btn-primary btn-sm" onClick={handleApply}>
-						Apply
-					</button>
 					<button type="button" className="btn-secondary btn-sm" onClick={handleReset}>
-						Reset
+						Reset filters
 					</button>
 				</div>
 			</div>

@@ -157,27 +157,33 @@ async function publishCourse(id, instructorId) {
 }
 
 async function getAllPublishedCourses(filters = {}) {
-	const where = {
-		status: 'PUBLISHED',
-	};
+	const andClauses = [{ status: 'PUBLISHED' }];
 
-	if (filters.search) {
-		where.title = {
-			contains: filters.search,
-			mode: 'insensitive',
-		};
+	const q = (filters.search || '').trim();
+	if (q) {
+		andClauses.push({
+			OR: [
+				{ title: { contains: q, mode: 'insensitive' } },
+				{ description: { contains: q, mode: 'insensitive' } },
+				{ category: { contains: q, mode: 'insensitive' } },
+				{ instructor: { name: { contains: q, mode: 'insensitive' } } },
+			],
+		});
 	}
 
-	if (filters.category) {
-		where.category = filters.category;
+	const categoryFilter = (filters.category || '').trim();
+	if (categoryFilter) {
+		andClauses.push({
+			category: { equals: categoryFilter, mode: 'insensitive' },
+		});
 	}
 
 	if (filters.difficulty) {
-		where.difficulty = filters.difficulty;
+		andClauses.push({ difficulty: filters.difficulty });
 	}
 
 	return prisma.course.findMany({
-		where,
+		where: { AND: andClauses },
 		include: {
 			instructor: {
 				select: {
