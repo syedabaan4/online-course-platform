@@ -1,9 +1,866 @@
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { getCourseById } from '../../api/course.api';
+import {
+	getCourseProgress,
+	getCourseProgressDetails,
+	getNextIncompleteLecture,
+	markLectureComplete,
+} from '../../api/progress.api';
+import { getMyAttempts } from '../../api/quiz.api';
+import { showError, showSuccess } from '../../components/Toast';
+import LoadingSpinner from '../../components/LoadingSpinner';
+import { useAuth } from '../../context/AuthContext';
+
+const normalizePayload = (payload) => payload?.data ?? payload;
+
+const font = { fontFamily: 'var(--font)' };
+
+function toYouTubeEmbedUrl(url) {
+	if (!url || typeof url !== 'string') {
+		return '';
+	}
+	const u = url.trim();
+	if (u.includes('youtube.com/embed/')) {
+		return u.split('?')[0];
+	}
+	if (!/youtube\.com|youtu\.be/i.test(u)) {
+		return '';
+	}
+	try {
+		const parsed = new URL(u);
+		if (parsed.hostname === 'youtu.be') {
+			const id = parsed.pathname.replace(/^\//, '').split('/')[0];
+			return id ? `https://www.youtube.com/embed/${id}` : '';
+		}
+		if (parsed.hostname.includes('youtube.com')) {
+			const v = parsed.searchParams.get('v');
+			if (v) {
+				return `https://www.youtube.com/embed/${v}`;
+			}
+			const m = parsed.pathname.match(/\/(embed|live|v)\/([^/?]+)/);
+			if (m) {
+				return `https://www.youtube.com/embed/${m[2]}`;
+			}
+		}
+	} catch {
+		return '';
+	}
+	return '';
+}
+
+function isYouTubeUrl(url) {
+	return Boolean(url && /youtube\.com|youtu\.be/i.test(String(url)));
+}
+
+function findLectureInCourse(course, lectureId) {
+	if (!course?.modules || !lectureId) {
+		return null;
+	}
+	for (const m of course.modules) {
+		const lec = (m.lectures || []).find((l) => l.id === lectureId);
+		if (lec) {
+			return { lecture: lec, module: m };
+		}
+	}
+	return null;
+}
+
+function getFirstLecture(course) {
+	const modules = [...(course?.modules || [])].sort((a, b) => (a.order || 0) - (b.order || 0));
+	for (const m of modules) {
+		const lecs = [...(m.lectures || [])].sort((a, b) => (a.order || 0) - (b.order || 0));
+		if (lecs.length) {
+			return { lecture: lecs[0], module: m };
+		}
+	}
+	return null;
+}
+
+function getResourceLabel(fileUrl) {
+	if (!fileUrl) {
+		return { title: 'File', sub: 'Download' };
+	}
+	if (/^https?:\/\//i.test(fileUrl) && !/\/uploads\//i.test(fileUrl)) {
+		return { title: 'External', sub: 'External Link' };
+	}
+	const lower = fileUrl.toLowerCase();
+	if (lower.endsWith('.zip')) {
+		return { title: 'ZIP', sub: 'Download' };
+	}
+	if (lower.endsWith('.pdf')) {
+		return { title: 'PDF', sub: 'Download' };
+	}
+	return { title: 'File', sub: 'Download' };
+}
+
 const CoursePlayer = () => {
+	const { courseId: courseIdParam } = useParams();
+	const { user } = useAuth();
+	const courseId = parseInt(courseIdParam, 10);
+
+	const [course, setCourse] = useState(null);
+	const [progressDetails, setProgressDetails] = useState([]);
+	const [overallProgress, setOverallProgress] = useState(null);
+	const [activeLectureId, setActiveLectureId] = useState(null);
+	const [expandedModuleIds, setExpandedModuleIds] = useState(() => new Set());
+	const [quizPassed, setQuizPassed] = useState({});
+	const [isLoading, setIsLoading] = useState(true);
+	const [loadError, setLoadError] = useState('');
+	const [progressError, setProgressError] = useState('');
+	const [markError, setMarkError] = useState('');
+	const [isMarking, setIsMarking] = useState(false);
+	const [showCertBanner, setShowCertBanner] = useState(false);
+
+	const sortedModules = useMemo(() => {
+		if (!course?.modules) {
+			return [];
+		}
+		return [...course.modules].sort((a, b) => (a.order || 0) - (b.order || 0));
+	}, [course]);
+
+	const totalLectures = useMemo(
+		() => sortedModules.reduce((n, m) => n + (Array.isArray(m.lectures) ? m.lectures.length : 0), 0),
+		[sortedModules]
+	);
+
+	const totalModules = sortedModules.length;
+
+	const activeLectureInfo = useMemo(
+		() => (course && activeLectureId ? findLectureInCourse(course, activeLectureId) : null),
+		[course, activeLectureId]
+	);
+
+	const activeLecture = activeLectureInfo?.lecture || null;
+	const activeModule = activeLectureInfo?.module || null;
+
+	const activeModuleIndex = useMemo(() => {
+		if (!activeModule) {
+			return 0;
+		}
+		return sortedModules.findIndex((m) => m.id === activeModule.id);
+	}, [activeModule, sortedModules]);
+
+	const isLectureComplete = useCallback(
+		(lectureId) => {
+			const row = (progressDetails || []).find((p) => p.lectureId === lectureId);
+			return Boolean(row?.isComplete);
+		},
+		[progressDetails]
+	);
+
+	const loadAll = useCallback(async () => {
+		if (!Number.isFinite(courseId) || courseId < 1) {
+			setLoadError('Invalid course.');
+			setCourse(null);
+			setIsLoading(false);
+			return;
+		}
+		setIsLoading(true);
+		setLoadError('');
+		setProgressError('');
+		setMarkError('');
+		setShowCertBanner(false);
+		try {
+			const cRes = await getCourseById(courseId);
+			const c = normalizePayload(cRes);
+			setCourse(c);
+			const mods = [...(c?.modules || [])].sort((a, b) => (a.order || 0) - (b.order || 0));
+			const first = getFirstLecture(c);
+
+			let details = [];
+			try {
+				const dRes = await getCourseProgressDetails(courseId);
+				details = normalizePayload(dRes) || [];
+				if (!Array.isArray(details)) {
+					details = [];
+				}
+			} catch (e) {
+				setProgressError(String(e));
+			}
+			setProgressDetails(details);
+
+			let progress = null;
+			try {
+				const pRes = await getCourseProgress(courseId);
+				progress = normalizePayload(pRes);
+			} catch (e) {
+				if (!details.length) {
+					setProgressError((prev) => prev || String(e));
+				}
+			}
+			setOverallProgress(progress);
+			if (progress?.totalLectures > 0 && progress.completedLectures >= progress.totalLectures) {
+				setShowCertBanner(true);
+			}
+
+			let nextLectureId = null;
+			try {
+				const nRes = await getNextIncompleteLecture(courseId);
+				const n = normalizePayload(nRes);
+				const nextLec = n?.lecture ?? n;
+				if (nextLec?.id) {
+					nextLectureId = nextLec.id;
+				}
+			} catch {
+				// optional
+			}
+			if (nextLectureId) {
+				setActiveLectureId(nextLectureId);
+			} else if (first?.lecture) {
+				setActiveLectureId(first.lecture.id);
+			} else {
+				setActiveLectureId(null);
+			}
+			if (nextLectureId) {
+				const found = findLectureInCourse(c, nextLectureId);
+				if (found?.module) {
+					setExpandedModuleIds(new Set([found.module.id]));
+				}
+			} else if (first?.module) {
+				setExpandedModuleIds(new Set([first.module.id]));
+			} else {
+				const initial = mods.length ? new Set([mods[0].id]) : new Set();
+				setExpandedModuleIds(initial);
+			}
+		} catch (e) {
+			setLoadError(String(e));
+			setCourse(null);
+		} finally {
+			setIsLoading(false);
+		}
+	}, [courseId]);
+
+	useEffect(() => {
+		void loadAll();
+	}, [loadAll]);
+
+	useEffect(() => {
+		if (!course?.modules) {
+			return;
+		}
+		let cancelled = false;
+		const run = async () => {
+			const byId = {};
+			const quizIds = course.modules
+				.map((m) => m.quiz)
+				.filter((q) => q && q.isPublished)
+				.map((q) => q.id);
+			await Promise.all(
+				quizIds.map(async (qid) => {
+					try {
+						const r = await getMyAttempts(qid);
+						const arr = normalizePayload(r);
+						const list = Array.isArray(arr) ? arr : [];
+						byId[qid] = list.some((a) => a.passed);
+					} catch {
+						byId[qid] = false;
+					}
+				})
+			);
+			if (!cancelled) {
+				setQuizPassed(byId);
+			}
+		};
+		void run();
+		return () => {
+			cancelled = true;
+		};
+	}, [course]);
+
+	const toggleModule = (id) => {
+		setExpandedModuleIds((prev) => {
+			const next = new Set(prev);
+			if (next.has(id)) {
+				next.delete(id);
+			} else {
+				next.add(id);
+			}
+			return next;
+		});
+	};
+
+	const courseTitleShort = (course?.title || '').length > 28 ? `${(course?.title || '').slice(0, 28)}…` : (course?.title || '');
+
+	const pct = overallProgress?.percentage != null ? Math.min(100, Math.max(0, overallProgress.percentage)) : 0;
+	const completedN = overallProgress?.completedLectures ?? 0;
+
+	const handleMarkComplete = async () => {
+		if (!activeLectureId || !activeLecture) {
+			return;
+		}
+		if (isLectureComplete(activeLectureId)) {
+			return;
+		}
+		setIsMarking(true);
+		setMarkError('');
+		try {
+			await markLectureComplete(activeLectureId, true);
+			const dRes = await getCourseProgressDetails(courseId);
+			const details = normalizePayload(dRes) || [];
+			setProgressDetails(Array.isArray(details) ? details : []);
+			const pRes = await getCourseProgress(courseId);
+			const p = normalizePayload(pRes);
+			setOverallProgress(p);
+			showSuccess('Lecture marked complete.');
+			if (p?.totalLectures > 0 && p.completedLectures >= p.totalLectures) {
+				setShowCertBanner(true);
+			}
+		} catch (e) {
+			setMarkError(String(e));
+			showError(String(e));
+		} finally {
+			setIsMarking(false);
+		}
+	};
+
+	const handleSaveLecture = () => {
+		if (!activeLectureId || !courseId) {
+			return;
+		}
+		const key = `savedLecturesMap`;
+		try {
+			const raw = localStorage.getItem(key);
+			const o = raw ? JSON.parse(raw) : {};
+			const set = new Set(o[courseId] || []);
+			set.add(activeLectureId);
+			localStorage.setItem(key, JSON.stringify({ ...o, [courseId]: [...set] }));
+			showSuccess('Lecture saved for later.');
+		} catch {
+			localStorage.setItem(key, JSON.stringify({ [courseId]: [activeLectureId] }));
+			showSuccess('Lecture saved for later.');
+		}
+	};
+
+	const videoEmbed = activeLecture?.videoUrl ? toYouTubeEmbedUrl(activeLecture.videoUrl) : '';
+	const showYt = Boolean(activeLecture?.videoUrl && isYouTubeUrl(activeLecture.videoUrl) && videoEmbed);
+
+	const userInitial = (user?.name || 'U').trim().charAt(0).toUpperCase() || 'U';
+
+	if (isLoading) {
+		return <LoadingSpinner fullPage />;
+	}
+
+	if (loadError || !course) {
+		return (
+			<main className="page-fade" style={{ ...font, minHeight: '100vh', padding: 48, background: 'var(--bg-primary)' }}>
+				<h1 style={{ color: 'var(--text-primary)', fontSize: 24, fontWeight: 800, marginBottom: 8 }}>Unable to load course</h1>
+				<p style={{ color: 'var(--error)', marginBottom: 20 }}>{loadError || 'This course is unavailable or has been removed.'}</p>
+				<Link to="/my-courses" className="btn-secondary" style={{ display: 'inline-flex' }}>
+					Back to my courses
+				</Link>
+			</main>
+		);
+	}
+
 	return (
-		<main className="page-fade" style={{ padding: '32px 48px', color: 'var(--text-body)', fontFamily: 'var(--font)' }}>
-			<h1 style={{ marginBottom: '8px' }}>Course Player</h1>
-			<p>Watch lectures and track your progress.</p>
-		</main>
+		<div
+			className="page-fade"
+			style={{
+				width: '100%',
+				height: 'calc(100vh - 64px)',
+				maxHeight: 'calc(100vh - 64px)',
+				background: 'var(--bg-primary)',
+				display: 'flex',
+				flexDirection: 'column',
+				overflow: 'hidden',
+				...font,
+			}}
+		>
+			<header
+				style={{
+					display: 'flex',
+					height: 64,
+					paddingLeft: 24,
+					paddingRight: 24,
+					background: 'var(--bg-surface)',
+					borderBottom: '1px solid var(--border)',
+					justifyContent: 'space-between',
+					alignItems: 'center',
+					flexShrink: 0,
+				}}
+			>
+				<Link
+					to="/my-courses"
+					style={{ display: 'inline-flex', alignItems: 'center', gap: 8, textDecoration: 'none', color: 'var(--text-primary)' }}
+				>
+					<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden style={{ color: 'var(--text-primary)' }}>
+						<path
+							fill="currentColor"
+							d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
+						/>
+					</svg>
+					<span style={{ color: 'var(--text-primary)', fontSize: 14, fontWeight: 600, lineHeight: '20px', letterSpacing: '0.35px' }}>Back to Dashboard</span>
+				</Link>
+				<div style={{ display: 'flex', alignItems: 'center', gap: 16, minWidth: 0 }}>
+					<div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+						<div
+							title={course.title}
+							style={{
+								color: 'var(--text-secondary)',
+								fontSize: 14,
+								fontWeight: 500,
+								lineHeight: '20px',
+								overflow: 'hidden',
+								textOverflow: 'ellipsis',
+								whiteSpace: 'nowrap',
+								maxWidth: 220,
+							}}
+						>
+							{courseTitleShort || 'Course'}
+						</div>
+						<div style={{ width: 1, height: 16, background: 'var(--text-dim)', flexShrink: 0 }} />
+						<div style={{ color: 'var(--text-primary)', fontSize: 14, fontWeight: 700, lineHeight: '20px', whiteSpace: 'nowrap' }}>
+							{activeModule ? `Module ${activeModuleIndex + 1}` : '—'}
+						</div>
+					</div>
+					<div
+						style={{
+							padding: 8,
+							background: 'var(--bg-elevated)',
+							borderRadius: 9999,
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'center',
+							width: 36,
+							height: 36,
+							color: 'var(--text-secondary)',
+							fontSize: 14,
+							fontWeight: 600,
+						}}
+						aria-hidden
+					>
+						{userInitial}
+					</div>
+				</div>
+			</header>
+
+			<div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden' }}>
+				<aside
+					style={{
+						width: 320,
+						flexShrink: 0,
+						background: 'var(--bg-surface)',
+						borderRight: '1px solid var(--border)',
+						display: 'flex',
+						flexDirection: 'column',
+						overflow: 'hidden',
+					}}
+				>
+					<div style={{ padding: 20, borderBottom: '1px solid var(--border-light)', display: 'flex', flexDirection: 'column', gap: 4 }}>
+						<div
+							title={course.title}
+							style={{
+								color: 'var(--text-primary)',
+								fontSize: 16,
+								fontWeight: 700,
+								lineHeight: '24px',
+								overflow: 'hidden',
+								textOverflow: 'ellipsis',
+								display: '-webkit-box',
+								WebkitLineClamp: 2,
+								WebkitBoxOrient: 'vertical',
+							}}
+						>
+							{course.title}
+						</div>
+						<div className="progress-bar" style={{ width: '100%', height: 8, background: 'var(--border)', borderRadius: 9999, marginTop: 4 }}>
+							<div className="progress-fill" style={{ width: `${pct}%`, height: '100%', borderRadius: 9999 }} />
+						</div>
+						<div style={{ color: 'var(--text-muted)', fontSize: 12, lineHeight: '16px', marginTop: 2 }}>
+							{completedN} of {totalLectures} lectures complete
+						</div>
+						{progressError ? <div style={{ color: 'var(--error)', fontSize: 12, marginTop: 4 }}>{progressError}</div> : null}
+					</div>
+
+					<div
+						style={{
+							flex: 1,
+							minHeight: 0,
+							overflowY: 'auto',
+							overscrollBehavior: 'contain',
+							display: 'flex',
+							flexDirection: 'column',
+						}}
+					>
+						<div style={{ padding: '16px 20px 8px' }}>
+							<div style={{ color: 'var(--text-primary)', fontSize: 18, fontWeight: 700, lineHeight: '28px' }}>Course Syllabus</div>
+							<div style={{ color: 'var(--text-muted)', fontSize: 12, lineHeight: '16px' }}>
+								{totalModules} {totalModules === 1 ? 'Module' : 'Modules'} · {totalLectures} {totalLectures === 1 ? 'Lecture' : 'Lectures'}
+							</div>
+						</div>
+
+						{sortedModules.map((module, modIdx) => {
+							const isOpen = expandedModuleIds.has(module.id);
+							const lecs = [...(module.lectures || [])].sort((a, b) => (a.order || 0) - (b.order || 0));
+							return (
+								<div key={module.id} style={{ borderBottom: '1px solid var(--border-light)' }}>
+									<button
+										type="button"
+										onClick={() => toggleModule(module.id)}
+										style={{
+											width: '100%',
+											display: 'flex',
+											alignItems: 'center',
+											justifyContent: 'space-between',
+											padding: '16px 20px',
+											background: isOpen ? 'var(--bg-surface-alt)' : 'transparent',
+											border: 'none',
+											cursor: 'pointer',
+											textAlign: 'left',
+										}}
+									>
+										<span style={{ color: isOpen ? 'var(--text-primary)' : 'var(--text-body)', fontSize: 16, fontWeight: 600, lineHeight: '24px' }}>
+											{`Module ${modIdx + 1}: ${module.title}`}
+										</span>
+										<svg
+											width="12"
+											height="12"
+											viewBox="0 0 24 24"
+											style={{ color: 'var(--text-dim)', transform: isOpen ? 'rotate(180deg)' : 'none' }}
+										>
+											<path fill="currentColor" d="M7 10l5 5 5-5H7z" />
+										</svg>
+									</button>
+									{isOpen ? (
+										<div style={{ paddingTop: 4, paddingBottom: 4 }}>
+											{lecs.map((lec) => {
+												const isActive = lec.id === activeLectureId;
+												const done = isLectureComplete(lec.id);
+												const lecIndex = lecs.findIndex((l) => l.id === lec.id);
+												const label = `${modIdx + 1}.${lecIndex + 1} – ${lec.title}`;
+												return (
+													<button
+														type="button"
+														key={lec.id}
+														onClick={() => {
+															setActiveLectureId(lec.id);
+															setMarkError('');
+														}}
+														style={{
+															width: '100%',
+															border: 'none',
+															background: isActive ? 'var(--accent-bg)' : 'transparent',
+															borderRight: isActive ? '4px solid var(--accent)' : '4px solid transparent',
+															padding: '12px 20px',
+															display: 'flex',
+															alignItems: 'flex-start',
+															gap: 12,
+															cursor: 'pointer',
+															textAlign: 'left',
+														}}
+													>
+														<div style={{ width: 20, height: 22, paddingTop: 2, flexShrink: 0 }}>
+															{done ? (
+																<div
+																	style={{
+																		width: 20,
+																		height: 20,
+																		borderRadius: 9999,
+																		background: 'color-mix(in srgb, var(--success) 16%, var(--bg-surface))',
+																		display: 'flex',
+																		alignItems: 'center',
+																		justifyContent: 'center',
+																	}}
+																>
+																	<svg width="12" height="10" viewBox="0 0 12 10" style={{ color: 'var(--success)' }}>
+																		<path
+																			fill="currentColor"
+																			d="M1.5 5.2l2.3 2.1L10.1 0.5 11.5 2 3.5 9.2 0 5.2l1.5-1.2z"
+																		/>
+																	</svg>
+																</div>
+															) : isActive ? (
+																<div
+																	style={{
+																		width: 20,
+																		height: 20,
+																		borderRadius: 9999,
+																		background: 'var(--text-primary)',
+																		display: 'flex',
+																		alignItems: 'center',
+																		justifyContent: 'center',
+																	}}
+																>
+																	<svg width="7" height="9" viewBox="0 0 7 9" style={{ color: 'var(--bg-surface)' }}>
+																		<path fill="currentColor" d="M0 0v9l7-4.5L0 0z" />
+																	</svg>
+																</div>
+															) : (
+																<div style={{ width: 20, height: 20, borderRadius: 9999, border: '1px solid var(--text-dim)' }} />
+															)}
+														</div>
+														<div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+															<div
+																style={{
+																	color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
+																	fontSize: 14,
+																	fontWeight: isActive ? 700 : 500,
+																	lineHeight: '20px',
+																	wordBreak: 'break-word',
+																}}
+															>
+																{label}
+															</div>
+														</div>
+													</button>
+												);
+											})}
+											{module.quiz && module.quiz.isPublished ? (
+												<Link
+													to={`/learn/${courseId}/quiz/${module.quiz.id}`}
+													style={{
+														display: 'flex',
+														alignItems: 'center',
+														gap: 8,
+														padding: '10px 20px 14px',
+														fontSize: 14,
+														fontWeight: 600,
+														color: 'var(--accent)',
+													}}
+												>
+													<span>Module quiz: {module.quiz.title}</span>
+													{quizPassed[module.quiz.id] ? (
+														<span className="badge badge-beginner" style={{ textTransform: 'none', fontSize: 11 }}>
+															Passed
+														</span>
+													) : null}
+												</Link>
+											) : null}
+										</div>
+									) : null}
+								</div>
+							);
+						})}
+					</div>
+				</aside>
+
+				<main
+					style={{
+						flex: 1,
+						minHeight: 0,
+						background: 'var(--bg-primary)',
+						overflowY: 'auto',
+						overscrollBehavior: 'contain',
+						display: 'flex',
+						flexDirection: 'column',
+						minWidth: 0,
+					}}
+				>
+					{!activeLecture ? (
+						<div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 32 }}>
+							<div className="card" style={{ maxWidth: 480, textAlign: 'center' }}>
+								<p style={{ color: 'var(--text-body)', fontSize: 16, lineHeight: 1.5, margin: 0 }}>Select a lecture from the sidebar</p>
+							</div>
+						</div>
+					) : (
+						<div
+							style={{
+								width: '100%',
+								maxWidth: 1024,
+								padding: '32px 32px 48px',
+								margin: '0 auto',
+								display: 'flex',
+								flexDirection: 'column',
+								gap: 32,
+								boxSizing: 'border-box',
+							}}
+						>
+							{showCertBanner ? (
+								<Link
+									to="/certificates"
+									style={{
+										display: 'block',
+										padding: 16,
+										borderRadius: 8,
+										background: 'var(--accent-bg)',
+										color: 'var(--accent)',
+										fontWeight: 600,
+										textAlign: 'center',
+										textDecoration: 'none',
+									}}
+								>
+									🎓 Course complete! Get your certificate →
+								</Link>
+							) : null}
+							<div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+								<div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16 }}>
+									<div style={{ color: 'var(--text-primary)', fontSize: 24, fontWeight: 700, lineHeight: '32px' }}>{activeLecture.title}</div>
+									<div style={{ color: 'var(--text-muted)', fontSize: 14, fontWeight: 500, lineHeight: '20px', whiteSpace: 'nowrap' }}>{Math.round(pct)}% Complete</div>
+								</div>
+								<div className="progress-bar" style={{ width: '100%', height: 8, background: 'var(--border)', borderRadius: 9999 }}>
+									<div className="progress-fill" style={{ width: `${pct}%`, height: '100%', borderRadius: 9999 }} />
+								</div>
+							</div>
+
+							<div
+								style={{
+									width: '100%',
+									borderRadius: 12,
+									overflow: 'hidden',
+									background: 'var(--text-primary)',
+									boxShadow: 'var(--shadow-elevated)',
+								}}
+							>
+								{showYt ? (
+									<div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%', height: 0 }}>
+										<iframe
+											title={activeLecture.title}
+											src={videoEmbed}
+											allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+											allowFullScreen
+											style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
+										/>
+									</div>
+								) : activeLecture.videoUrl ? (
+									<div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%', height: 0, background: 'var(--text-primary)' }}>
+										<video
+											controls
+											src={activeLecture.videoUrl}
+											style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+										>
+											<track kind="captions" />
+										</video>
+									</div>
+								) : (
+									<div
+										style={{
+											aspectRatio: '16 / 9',
+											display: 'flex',
+											alignItems: 'center',
+											justifyContent: 'center',
+											color: 'var(--text-muted)',
+											fontSize: 14,
+										}}
+									>
+										No video URL for this lecture.
+									</div>
+								)}
+							</div>
+
+							<div
+								style={{
+									display: 'flex',
+									flexDirection: 'row',
+									flexWrap: 'wrap',
+									gap: 24,
+									justifyContent: 'space-between',
+									alignItems: 'flex-start',
+									paddingBottom: 32,
+									borderBottom: '1px solid var(--border)',
+								}}
+							>
+								<div style={{ flex: '1 1 300px', maxWidth: 672, display: 'flex', flexDirection: 'column', gap: 8 }}>
+									<div style={{ color: 'var(--text-primary)', fontSize: 20, fontWeight: 700, lineHeight: '28px' }}>About this lecture</div>
+									<div style={{ color: 'var(--text-secondary)', fontSize: 16, fontWeight: 400, lineHeight: '26px' }}>
+										{activeLecture.description || 'No description for this lecture.'}
+									</div>
+									{markError ? <div style={{ color: 'var(--error)', fontSize: 14, marginTop: 4 }}>{markError}</div> : null}
+								</div>
+								<div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'flex-start' }}>
+									<button type="button" className="btn-secondary btn-sm" onClick={handleSaveLecture} style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-body)' }}>
+										<svg width="12" height="12" viewBox="0 0 12 12" style={{ color: 'var(--text-body)' }}>
+											<path
+												fill="currentColor"
+												d="M2 0h5l3 3v7a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2zm0 2v8h8V4H6V2H2zm2 6h4v1H4V8zm0-2h4v1H4V6z"
+											/>
+										</svg>
+										Save
+									</button>
+									<button
+										type="button"
+										className="btn-primary btn-sm"
+										disabled={isLectureComplete(activeLectureId) || isMarking}
+										onClick={handleMarkComplete}
+										style={{
+											fontSize: 14,
+											fontWeight: 700,
+											opacity: isLectureComplete(activeLectureId) ? 0.65 : 1,
+											cursor: isLectureComplete(activeLectureId) ? 'default' : 'pointer',
+											padding: '11px 24px',
+										}}
+									>
+										<svg width="15" height="15" viewBox="0 0 15 15" style={{ color: 'var(--bg-surface)' }}>
+											<path fill="currentColor" d="M5.5 12.5.5 7.7l1.4-1.3 3.4 3.1 7.1-6.2 1.3 1.4-8.1 7.1z" />
+										</svg>
+										{isLectureComplete(activeLectureId) ? 'Completed' : 'Mark as Complete'}
+									</button>
+								</div>
+							</div>
+
+							<div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+								<div style={{ color: 'var(--text-primary)', fontSize: 18, fontWeight: 700, lineHeight: '28px' }}>Resources</div>
+								<div style={{ display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'stretch' }}>
+									{Array.isArray(activeLecture.resources) && activeLecture.resources.length > 0 ? (
+										activeLecture.resources.map((r) => {
+											const { title: typeLabel, sub: subLabel } = getResourceLabel(r.fileUrl);
+											const isHttp = r.fileUrl && /^https?:\/\//i.test(r.fileUrl);
+											const external = isHttp && !/\/uploads\//i.test(r.fileUrl);
+											return (
+												<div
+													key={r.id}
+													className="card"
+													style={{ flex: '1 1 180px', minWidth: 180, maxWidth: 400, display: 'flex', alignItems: 'center', gap: 16, padding: 16, boxShadow: 'var(--shadow-card)' }}
+												>
+													<div
+														style={{
+															width: 40,
+															height: 40,
+															borderRadius: 8,
+															background: external ? 'var(--accent-bg)' : 'var(--bg-elevated)',
+															display: 'flex',
+															alignItems: 'center',
+															justifyContent: 'center',
+														}}
+													>
+														<svg width="20" height="20" viewBox="0 0 20 20" style={{ color: external ? 'var(--text-primary)' : 'var(--text-secondary)' }}>
+															<path
+																fill="currentColor"
+																d="M4 2h8l4 4v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 2v12h12V7h-3V4H4zm2 2h4v1H6V6zm0 2h4v1H6V8zm0 2h4v1H6v-1z"
+															/>
+														</svg>
+													</div>
+													<div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+														<div style={{ color: 'var(--text-primary)', fontSize: 14, fontWeight: 700, lineHeight: '20px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.title}</div>
+														<div style={{ color: 'var(--text-muted)', fontSize: 12, lineHeight: '16px' }}>
+															{external ? 'External Link' : `${typeLabel} · ${subLabel}`}
+														</div>
+													</div>
+													{external ? (
+														<a
+															href={r.fileUrl}
+															target="_blank"
+															rel="noopener noreferrer"
+															style={{ display: 'flex', color: 'var(--text-dim)' }}
+															aria-label="Open link"
+														>
+															<svg width="18" height="18" viewBox="0 0 18 18">
+																<path
+																	fill="currentColor"
+																	d="M4 2h4v1H4v9h9V10h1v3a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1zm9.5-1H17v1h-3.3L8.1 7.1 7.2 6.2 11.1 1H13V0h2.3l3.1 3.1L14 0z"
+																/>
+															</svg>
+														</a>
+													) : (
+														<a href={r.fileUrl} target="_blank" rel="noopener noreferrer" download style={{ display: 'flex', color: 'var(--text-dim)' }} aria-label="Download">
+															<svg width="16" height="16" viewBox="0 0 24 24">
+																<path fill="currentColor" d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z" />
+															</svg>
+														</a>
+													)}
+												</div>
+											);
+										})
+									) : (
+										<div style={{ color: 'var(--text-muted)', fontSize: 14 }}>No resources for this lecture.</div>
+									)}
+								</div>
+							</div>
+						</div>
+					)}
+				</main>
+			</div>
+		</div>
 	);
 };
 
