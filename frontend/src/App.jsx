@@ -13,7 +13,9 @@ const CourseDetail = lazy(() => import('./pages/student/CourseDetail.jsx'));
 const MyCourses = lazy(() => import('./pages/student/MyCourses.jsx'));
 const CoursePlayer = lazy(() => import('./pages/student/CoursePlayer.jsx'));
 const MyCertificates = lazy(() => import('./pages/student/MyCertificates.jsx'));
+const CertificateView = lazy(() => import('./pages/student/CertificateView.jsx'));
 const QuizPlayer = lazy(() => import('./pages/student/QuizPlayer.jsx'));
+const CourseCompleted = lazy(() => import('./pages/student/CourseCompleted.jsx'));
 const InstructorDashboard = lazy(() => import('./pages/instructor/InstructorDashboard.jsx'));
 const CourseForm = lazy(() => import('./pages/instructor/CourseForm.jsx'));
 const CourseBuilder = lazy(() => import('./pages/instructor/CourseBuilder.jsx'));
@@ -72,10 +74,26 @@ const App = () => {
               }
             />
             <Route
+              path="/learn/:courseId/complete"
+              element={
+                <ProtectedRoute>
+                  <CourseCompleted />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/certificates"
               element={
                 <ProtectedRoute>
                   <MyCertificates />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/certificates/:certificateId"
+              element={
+                <ProtectedRoute>
+                  <CertificateView />
                 </ProtectedRoute>
               }
             />

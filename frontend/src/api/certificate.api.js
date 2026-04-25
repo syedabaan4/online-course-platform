@@ -36,6 +36,11 @@ export const getCertificateById = async (certificateId) => {
 	}
 };
 
-export const getDownloadUrl = (certificateId) => {
-	return `http://localhost:5000/api/certificates/${certificateId}/download`;
+export const getCertificateDownloadUrl = (certificateId) => {
+	const base = api.defaults.baseURL || '';
+	const id = encodeURIComponent(certificateId);
+	return `${base}/certificates/${id}/download`;
 };
+
+/** @deprecated Use getCertificateDownloadUrl */
+export const getDownloadUrl = getCertificateDownloadUrl;
