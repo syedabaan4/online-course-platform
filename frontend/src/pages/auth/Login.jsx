@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 const Login = () => {
 	const navigate = useNavigate();
+	const [searchParams] = useSearchParams();
 	const { login } = useAuth();
 
 	const [email, setEmail] = useState('');
@@ -29,6 +30,11 @@ const Login = () => {
 		setIsLoading(true);
 		try {
 			const user = await login(normalizedEmail, password);
+			const returnTo = searchParams.get('returnTo');
+			if (returnTo && returnTo.startsWith('/')) {
+				navigate(returnTo);
+				return;
+			}
 			if (user?.role === 'INSTRUCTOR') {
 				navigate('/instructor');
 			} else {

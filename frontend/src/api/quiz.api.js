@@ -36,6 +36,15 @@ export const updateQuiz = async (id, data) => {
 	}
 };
 
+export const publishQuiz = async (id) => {
+	try {
+		const response = await api.post(`/quizzes/${id}/publish`, {});
+		return response.data;
+	} catch (error) {
+		throw error.response?.data?.error || error.message;
+	}
+};
+
 export const deleteQuiz = async (id) => {
 	try {
 		const response = await api.delete(`/quizzes/${id}`);
@@ -48,6 +57,15 @@ export const deleteQuiz = async (id) => {
 export const addQuestion = async (quizId, data) => {
 	try {
 		const response = await api.post(`/quizzes/${quizId}/questions`, data);
+		return response.data;
+	} catch (error) {
+		throw error.response?.data?.error || error.message;
+	}
+};
+
+export const updateQuestion = async (questionId, data) => {
+	try {
+		const response = await api.put(`/quizzes/questions/${questionId}`, data);
 		return response.data;
 	} catch (error) {
 		throw error.response?.data?.error || error.message;

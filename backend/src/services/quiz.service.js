@@ -47,7 +47,37 @@ async function createQuiz(moduleId, data, instructorId) {
 		data: {
 			title: data.title,
 			passingScore: data.passingScore,
+			isPublished: false,
 			moduleId,
+		},
+	});
+}
+
+async function publishQuiz(id, instructorId) {
+	const quiz = await prisma.quiz.findUnique({
+		where: { id },
+		include: {
+			questions: { select: { id: true } },
+		},
+	});
+
+	if (!quiz) {
+		throw new Error('Quiz not found');
+	}
+
+	await verifyCourseOwnershipByModule(quiz.moduleId, instructorId);
+
+	if (quiz.questions.length === 0) {
+		throw new Error('Add at least one question before publishing');
+	}
+
+	return prisma.quiz.update({
+		where: { id },
+		data: { isPublished: true },
+		include: {
+			questions: {
+				include: { options: true },
+			},
 		},
 	});
 }
@@ -237,6 +267,7 @@ async function submitQuizAttempt(quizId, studentId, answers) {
 		select: {
 			id: true,
 			passingScore: true,
+			isPublished: true,
 			questions: {
 				select: {
 					id: true,
@@ -254,6 +285,10 @@ async function submitQuizAttempt(quizId, studentId, answers) {
 
 	if (!quiz) {
 		throw new Error('Quiz not found');
+	}
+
+	if (!quiz.isPublished) {
+		throw new Error('This quiz is not available yet');
 	}
 
 	if (!Array.isArray(answers) || answers.length !== quiz.questions.length) {
@@ -378,6 +413,7 @@ async function getLatestAttempt(quizId, studentId) {
 
 module.exports = {
 	createQuiz,
+	publishQuiz,
 	getQuizById,
 	getQuizByModule,
 	updateQuiz,

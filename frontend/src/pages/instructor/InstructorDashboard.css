@@ -1,0 +1,31 @@
+.instructor-course-actions {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	flex-wrap: nowrap;
+	gap: 8px;
+}
+
+.instructor-course-actions .btn-sm {
+	white-space: nowrap;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 36px;
+	box-sizing: border-box;
+}
+
+.dashboard-stat-icon {
+	width: 44px;
+	height: 44px;
+	border-radius: var(--radius);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+}
+
+.dashboard-stat-icon svg {
+	width: 22px;
+	height: 22px;
+}
