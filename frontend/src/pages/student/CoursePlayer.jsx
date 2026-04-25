@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { getCourseById } from '../../api/course.api';
+import { getQuizById } from '../../api/quiz.api';
 import {
 	getCourseProgress,
 	getCourseProgressDetails,
@@ -96,6 +97,7 @@ function getResourceLabel(fileUrl) {
 
 const CoursePlayer = () => {
 	const { courseId: courseIdParam } = useParams();
+	const navigate = useNavigate();
 	const { user } = useAuth();
 	const courseId = parseInt(courseIdParam, 10);
 
@@ -103,6 +105,11 @@ const CoursePlayer = () => {
 	const [progressDetails, setProgressDetails] = useState([]);
 	const [overallProgress, setOverallProgress] = useState(null);
 	const [activeLectureId, setActiveLectureId] = useState(null);
+	const [activeQuizId, setActiveQuizId] = useState(null);
+	const [previewQuiz, setPreviewQuiz] = useState(null);
+	const [previewAttempts, setPreviewAttempts] = useState([]);
+	const [previewQuizLoading, setPreviewQuizLoading] = useState(false);
+	const [previewQuizError, setPreviewQuizError] = useState('');
 	const [expandedModuleIds, setExpandedModuleIds] = useState(() => new Set());
 	const [quizPassed, setQuizPassed] = useState({});
 	const [isLoading, setIsLoading] = useState(true);
@@ -132,7 +139,15 @@ const CoursePlayer = () => {
 	);
 
 	const activeLecture = activeLectureInfo?.lecture || null;
-	const activeModule = activeLectureInfo?.module || null;
+
+	const moduleForActiveQuiz = useMemo(() => {
+		if (!activeQuizId || !course) {
+			return null;
+		}
+		return sortedModules.find((m) => m.quiz?.id === activeQuizId) || null;
+	}, [activeQuizId, course, sortedModules]);
+
+	const activeModule = activeLectureInfo?.module || moduleForActiveQuiz;
 
 	const activeModuleIndex = useMemo(() => {
 		if (!activeModule) {
@@ -207,10 +222,13 @@ const CoursePlayer = () => {
 			}
 			if (nextLectureId) {
 				setActiveLectureId(nextLectureId);
+				setActiveQuizId(null);
 			} else if (first?.lecture) {
 				setActiveLectureId(first.lecture.id);
+				setActiveQuizId(null);
 			} else {
 				setActiveLectureId(null);
+				setActiveQuizId(null);
 			}
 			if (nextLectureId) {
 				const found = findLectureInCourse(c, nextLectureId);
@@ -234,6 +252,46 @@ const CoursePlayer = () => {
 	useEffect(() => {
 		void loadAll();
 	}, [loadAll]);
+
+	useEffect(() => {
+		if (!activeQuizId) {
+			setPreviewQuiz(null);
+			setPreviewAttempts([]);
+			setPreviewQuizError('');
+			setPreviewQuizLoading(false);
+			return;
+		}
+		let cancelled = false;
+		setPreviewQuizLoading(true);
+		setPreviewQuizError('');
+		(async () => {
+			try {
+				const qRes = await getQuizById(activeQuizId);
+				const q = normalizePayload(qRes);
+				if (!cancelled) {
+					setPreviewQuiz(q);
+				}
+				const aRes = await getMyAttempts(activeQuizId);
+				const list = normalizePayload(aRes);
+				if (!cancelled) {
+					setPreviewAttempts(Array.isArray(list) ? list : []);
+				}
+			} catch (e) {
+				if (!cancelled) {
+					setPreviewQuizError(String(e));
+					setPreviewQuiz(null);
+					setPreviewAttempts([]);
+				}
+			} finally {
+				if (!cancelled) {
+					setPreviewQuizLoading(false);
+				}
+			}
+		})();
+		return () => {
+			cancelled = true;
+		};
+	}, [activeQuizId]);
 
 	useEffect(() => {
 		if (!course?.modules) {
@@ -411,7 +469,11 @@ const CoursePlayer = () => {
 						</div>
 						<div style={{ width: 1, height: 16, background: 'var(--text-dim)', flexShrink: 0 }} />
 						<div style={{ color: 'var(--text-primary)', fontSize: 14, fontWeight: 700, lineHeight: '20px', whiteSpace: 'nowrap' }}>
-							{activeModule ? `Module ${activeModuleIndex + 1}` : '—'}
+							{activeModule
+								? activeQuizId
+									? `Module ${activeModuleIndex + 1} Quiz`
+									: `Module ${activeModuleIndex + 1}`
+								: '—'}
 						</div>
 					</div>
 					<div
@@ -535,6 +597,7 @@ const CoursePlayer = () => {
 														key={lec.id}
 														onClick={() => {
 															setActiveLectureId(lec.id);
+															setActiveQuizId(null);
 															setMarkError('');
 														}}
 														style={{
@@ -607,9 +670,15 @@ const CoursePlayer = () => {
 												);
 											})}
 											{module.quiz && module.quiz.isPublished ? (
-												<Link
-													to={`/learn/${courseId}/quiz/${module.quiz.id}`}
+												<button
+													type="button"
+													onClick={() => {
+														setActiveQuizId(module.quiz.id);
+														setActiveLectureId(null);
+														setMarkError('');
+													}}
 													style={{
+														width: '100%',
 														display: 'flex',
 														alignItems: 'center',
 														gap: 8,
@@ -617,15 +686,39 @@ const CoursePlayer = () => {
 														fontSize: 14,
 														fontWeight: 600,
 														color: 'var(--accent)',
+														background:
+															activeQuizId === module.quiz.id ? 'var(--accent-bg)' : 'transparent',
+														border: 'none',
+														borderRight:
+															activeQuizId === module.quiz.id ? '4px solid var(--accent)' : '4px solid transparent',
+														cursor: 'pointer',
+														textAlign: 'left',
 													}}
 												>
-													<span>Module quiz: {module.quiz.title}</span>
+													<span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{module.quiz.title}</span>
 													{quizPassed[module.quiz.id] ? (
 														<span className="badge badge-beginner" style={{ textTransform: 'none', fontSize: 11 }}>
 															Passed
 														</span>
 													) : null}
-												</Link>
+													{activeQuizId === module.quiz.id ? (
+														<span
+															style={{
+																marginLeft: 'auto',
+																fontSize: 10,
+																fontWeight: 700,
+																textTransform: 'uppercase',
+																letterSpacing: '0.4px',
+																color: 'var(--accent)',
+																background: 'var(--bg-surface)',
+																padding: '4px 8px',
+																borderRadius: 6,
+															}}
+														>
+															Active
+														</span>
+													) : null}
+												</button>
 											) : null}
 										</div>
 									) : null}
@@ -647,10 +740,35 @@ const CoursePlayer = () => {
 						minWidth: 0,
 					}}
 				>
-					{!activeLecture ? (
+					{activeQuizId ? (
+						<div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+							{previewQuizLoading ? (
+								<div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 32 }}>
+									<div className="spinner" />
+								</div>
+							) : previewQuizError ? (
+								<div style={{ padding: 32 }}>
+									<p style={{ color: 'var(--error)', fontSize: 14 }}>{previewQuizError}</p>
+								</div>
+							) : previewQuiz && !previewQuiz.isPublished ? (
+								<div style={{ padding: 32 }}>
+									<p style={{ color: 'var(--text-muted)', fontSize: 16 }}>This quiz is not available yet.</p>
+								</div>
+							) : previewQuiz ? (
+								<CourseQuizPreview
+									courseId={courseId}
+									moduleIndex={activeModuleIndex}
+									quiz={previewQuiz}
+									attempts={previewAttempts}
+									moduleDescription={moduleForActiveQuiz?.description}
+									onStartQuiz={() => navigate(`/learn/${courseId}/quiz/${activeQuizId}`)}
+								/>
+							) : null}
+						</div>
+					) : !activeLecture ? (
 						<div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 32 }}>
 							<div className="card" style={{ maxWidth: 480, textAlign: 'center' }}>
-								<p style={{ color: 'var(--text-body)', fontSize: 16, lineHeight: 1.5, margin: 0 }}>Select a lecture from the sidebar</p>
+								<p style={{ color: 'var(--text-body)', fontSize: 16, lineHeight: 1.5, margin: 0 }}>Select a lecture or module quiz from the sidebar</p>
 							</div>
 						</div>
 					) : (
@@ -863,5 +981,181 @@ const CoursePlayer = () => {
 		</div>
 	);
 };
+
+function CourseQuizPreview({ courseId, moduleIndex, quiz, attempts, moduleDescription, onStartQuiz }) {
+	const sortedQuestions = [...(quiz.questions || [])].sort((a, b) => a.id - b.id);
+	const n = sortedQuestions.length;
+	const best = attempts.length ? Math.max(...attempts.map((a) => Number(a.score) || 0)) : null;
+	const bestLabel = best == null ? 'Not attempted' : `${Math.round(best * 10) / 10}%`;
+	const description =
+		(moduleDescription && String(moduleDescription).trim()) ||
+		'Test your knowledge of the material in this module. Read each question carefully and select the best answer.';
+
+	return (
+		<div
+			style={{
+				width: '100%',
+				maxWidth: 1024,
+				padding: '32px 32px 64px',
+				margin: '0 auto',
+				boxSizing: 'border-box',
+			}}
+		>
+			<nav style={{ display: 'flex', flexWrap: 'wrap', gap: 8, fontSize: 12, color: 'var(--text-muted)', marginBottom: 20 }}>
+				<Link to={`/learn/${courseId}`} style={{ color: 'var(--text-muted)' }}>
+					Course home
+				</Link>
+				<span aria-hidden>›</span>
+				<span style={{ color: 'var(--text-secondary)' }}>{moduleIndex >= 0 ? `Module ${moduleIndex + 1}` : 'Module'}</span>
+				<span aria-hidden>›</span>
+				<span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>Quiz</span>
+			</nav>
+			<h1 style={{ color: 'var(--text-primary)', fontSize: 32, fontWeight: 800, lineHeight: 1.2, margin: '0 0 12px' }}>{quiz.title}</h1>
+			<p style={{ color: 'var(--text-secondary)', fontSize: 16, lineHeight: 1.6, margin: '0 0 32px', maxWidth: 720 }}>{description}</p>
+
+			<div
+				style={{
+					display: 'grid',
+					gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+					gap: 16,
+					marginBottom: 32,
+				}}
+			>
+				<PreviewStatCard
+					tint="var(--accent-bg)"
+					iconColor="var(--accent)"
+					label="Questions"
+					value={String(n)}
+					icon={
+						<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden>
+							<path fill="currentColor" d="M4 6h2v12H4V6zm4 0h2v7H8V6zm4 0h2v10h-2V6zm4 0h2v4h-2V6z" />
+						</svg>
+					}
+				/>
+				<PreviewStatCard
+					tint="color-mix(in srgb, var(--success) 15%, var(--bg-surface))"
+					iconColor="var(--success)"
+					label="Passing score"
+					value={`${quiz.passingScore}%`}
+					icon={
+						<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden>
+							<path fill="currentColor" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" />
+						</svg>
+					}
+				/>
+				<PreviewStatCard
+					tint="var(--bg-elevated)"
+					iconColor="var(--text-secondary)"
+					label="Attempts"
+					value="Unlimited"
+					icon={
+						<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden>
+							<path
+								fill="currentColor"
+								d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"
+							/>
+						</svg>
+					}
+				/>
+				<PreviewStatCard
+					tint="var(--bg-elevated)"
+					iconColor="var(--text-body)"
+					label="Best score"
+					value={bestLabel}
+					valueMuted={!attempts.length}
+					icon={
+						<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden>
+							<path fill="currentColor" d="M5 16L3 5l5.5 3L12 3l3.5 2L21 3l-2 11H5zm0 0v2h14v-2H5z" />
+						</svg>
+					}
+				/>
+			</div>
+
+			<div
+				className="card"
+				style={{
+					textAlign: 'center',
+					padding: '40px 32px 32px',
+					maxWidth: 560,
+					margin: '0 auto',
+					boxShadow: 'var(--shadow-card)',
+				}}
+			>
+				<div
+					style={{
+						width: 72,
+						height: 72,
+						margin: '0 auto 20px',
+						borderRadius: 9999,
+						background: 'var(--accent-bg)',
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+						color: 'var(--accent)',
+					}}
+				>
+					<svg width="36" height="36" viewBox="0 0 24 24" fill="none" aria-hidden>
+						<path
+							stroke="currentColor"
+							strokeWidth="1.7"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							d="M15.59 14.37a6 6 0 0 1-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 0 0 6.16-12.12A14.98 14.98 0 0 0 9.63 8.41m5.95 5.95a14.93 14.93 0 0 1-5.84 2.58m-.12-8.54a6 6 0 0 0-7.38 5.84h4.8m2.58-5.84a14.93 14.93 0 0 0-2.58 5.84m2.7 2.7a12.1 12.1 0 0 1-2.63 0 6.01 6.01 0 0 1-2.3-1.06"
+						/>
+					</svg>
+				</div>
+				<h2 style={{ color: 'var(--text-primary)', fontSize: 22, fontWeight: 800, margin: '0 0 12px' }}>Ready to start?</h2>
+				<p style={{ color: 'var(--text-secondary)', fontSize: 15, lineHeight: 1.6, margin: '0 0 28px' }}>
+					Make sure you have a stable internet connection. The quiz will begin immediately after you click the button below.
+				</p>
+				<button type="button" className="btn-primary" onClick={onStartQuiz} style={{ display: 'inline-flex', margin: '0 auto' }}>
+					Start quiz
+					<svg width="16" height="16" viewBox="0 0 24 24" style={{ marginLeft: 4 }} aria-hidden>
+						<path fill="currentColor" d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8-8-8z" />
+					</svg>
+				</button>
+				<p style={{ color: 'var(--text-muted)', fontSize: 12, margin: '20px 0 0' }}>
+					By starting, you agree to the <span style={{ textDecoration: 'underline', cursor: 'default' }}>Honor code</span>.
+				</p>
+			</div>
+		</div>
+	);
+}
+
+function PreviewStatCard({ tint, iconColor, label, value, valueMuted, icon }) {
+	return (
+		<div
+			className="card"
+			style={{
+				padding: 16,
+				display: 'flex',
+				alignItems: 'flex-start',
+				gap: 12,
+				boxShadow: 'var(--shadow-card)',
+				background: 'var(--bg-surface)',
+			}}
+		>
+			<div
+				style={{
+					width: 44,
+					height: 44,
+					borderRadius: 9999,
+					background: tint,
+					color: iconColor,
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+					flexShrink: 0,
+				}}
+			>
+				{icon}
+			</div>
+			<div>
+				<div style={{ color: 'var(--text-muted)', fontSize: 12, fontWeight: 500, marginBottom: 2 }}>{label}</div>
+				<div style={{ color: valueMuted ? 'var(--text-muted)' : 'var(--text-primary)', fontSize: 18, fontWeight: 700, lineHeight: 1.2 }}>{value}</div>
+			</div>
+		</div>
+	);
+}
 
 export default CoursePlayer;
