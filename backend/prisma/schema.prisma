@@ -127,6 +127,7 @@ model Quiz {
   id           Int       @id @default(autoincrement())
   title        String
   passingScore Int       // percentage e.g. 70
+  isPublished  Boolean   @default(false)
 
   module       Module    @relation(fields: [moduleId], references: [id], onDelete: Cascade)
   moduleId     Int       @unique

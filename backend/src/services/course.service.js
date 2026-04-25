@@ -49,6 +49,21 @@ async function getCourseById(id) {
 						orderBy: {
 							order: 'asc',
 						},
+						include: {
+							resources: {
+								orderBy: {
+									id: 'asc',
+								},
+							},
+						},
+					},
+					quiz: {
+						select: {
+							id: true,
+							title: true,
+							passingScore: true,
+							isPublished: true,
+						},
 					},
 				},
 			},

@@ -10,7 +10,7 @@ async function checkCourseCompletion(studentId, courseId) {
 						select: { id: true },
 					},
 					quiz: {
-						select: { id: true },
+						select: { id: true, isPublished: true },
 					},
 				},
 			},
@@ -41,8 +41,8 @@ async function checkCourseCompletion(studentId, courseId) {
 	}
 
 	const quizIds = course.modules
-		.map((module) => module.quiz?.id)
-		.filter((quizId) => quizId !== undefined);
+		.filter((module) => module.quiz?.isPublished)
+		.map((module) => module.quiz.id);
 
 	if (quizIds.length > 0) {
 		const passedAttempts = await prisma.quizAttempt.findMany({

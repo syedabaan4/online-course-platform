@@ -141,6 +141,16 @@ router.get('/:id/attempts/my', authenticate, async (req, res) => {
 	}
 });
 
+router.post('/:id/publish', authenticate, requireInstructor, async (req, res) => {
+	try {
+		const quiz = await quizService.publishQuiz(parseInt(req.params.id, 10), req.user.id);
+		return res.status(200).json({ data: quiz });
+	} catch (error) {
+		const statusCode = getStatusCode(error.message || '');
+		return res.status(statusCode).json({ error: error.message });
+	}
+});
+
 router.get('/:id', async (req, res) => {
 	try {
 		const quiz = await quizService.getQuizById(parseInt(req.params.id, 10));

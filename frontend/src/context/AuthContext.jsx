@@ -4,6 +4,10 @@ import { loginUser, registerUser } from '../api/auth.api.js';
 
 const AuthContext = createContext();
 
+const normalizeAuthPayload = (payload) => payload?.data ?? payload ?? {};
+
+const normalizeRole = (role) => String(role || '').toUpperCase();
+
 const getInitialAuthState = () => {
 	try {
 		const storedUser = localStorage.getItem('user');
@@ -33,9 +37,14 @@ export const AuthProvider = ({ children }) => {
 	}, []);
 
 	const login = async (email, password) => {
-		const data = await loginUser(email, password);
-		const nextUser = data.user;
-		const nextToken = data.token;
+		const payload = await loginUser(email, password);
+		const data = normalizeAuthPayload(payload);
+		const nextUser = data?.user ? { ...data.user, role: normalizeRole(data.user.role) } : null;
+		const nextToken = data?.token || null;
+
+		if (!nextUser || !nextToken) {
+			throw new Error('Invalid authentication response from server.');
+		}
 
 		localStorage.setItem('user', JSON.stringify(nextUser));
 		localStorage.setItem('token', nextToken);
@@ -50,7 +59,7 @@ export const AuthProvider = ({ children }) => {
 	};
 
 	const register = async (name, email, password, role) => {
-		await registerUser(name, email, password, role);
+		await registerUser(name, email, password, normalizeRole(role));
 		return true;
 	};
 
@@ -69,7 +78,7 @@ export const AuthProvider = ({ children }) => {
 			register,
 			logout,
 			isAuthenticated: authState.user !== null,
-			isInstructor: authState.user?.role === 'INSTRUCTOR',
+			isInstructor: normalizeRole(authState.user?.role) === 'INSTRUCTOR',
 		}),
 		[authState, isLoading]
 	);

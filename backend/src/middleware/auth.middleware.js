@@ -22,6 +22,25 @@ function authenticate(req, res, next) {
 	}
 }
 
+function optionalAuth(req, res, next) {
+	const authHeader = req.headers.authorization;
+	if (!authHeader || !authHeader.startsWith('Bearer ')) {
+		return next();
+	}
+
+	const token = authHeader.split(' ')[1];
+	try {
+		const payload = jwt.verify(token, process.env.JWT_SECRET);
+		req.user = {
+			id: payload.id,
+			email: payload.email,
+			role: payload.role,
+		};
+	} catch {
+	}
+	return next();
+}
+
 function requireInstructor(req, res, next) {
 	const checkRole = () => {
 		if (!req.user || req.user.role !== 'INSTRUCTOR') {
@@ -40,5 +59,6 @@ function requireInstructor(req, res, next) {
 
 module.exports = {
 	authenticate,
+	optionalAuth,
 	requireInstructor,
 };

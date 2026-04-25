@@ -1,6 +1,6 @@
 const express = require('express');
 const courseService = require('../services/course.service');
-const { authenticate, requireInstructor } = require('../middleware/auth.middleware');
+const { authenticate, optionalAuth, requireInstructor } = require('../middleware/auth.middleware');
 
 const router = express.Router();
 
@@ -40,10 +40,20 @@ router.get('/my', authenticate, requireInstructor, async (req, res) => {
 	}
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', optionalAuth, async (req, res) => {
 	try {
 		const id = parseInt(req.params.id, 10);
 		const course = await courseService.getCourseById(id);
+		const isPublished = String(course?.status || '').toUpperCase() === 'PUBLISHED';
+		if (!isPublished) {
+			const isOwner =
+				req.user &&
+				String(req.user.role || '').toUpperCase() === 'INSTRUCTOR' &&
+				course.instructorId === req.user.id;
+			if (!isOwner) {
+				return res.status(404).json({ error: 'Course not found' });
+			}
+		}
 		return res.status(200).json({ data: course });
 	} catch (error) {
 		const status = mapErrorToStatus(error.message || '');
