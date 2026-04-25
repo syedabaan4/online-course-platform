@@ -51,11 +51,13 @@ npx prisma migrate dev --name init
 npx prisma generate
 ```
 
-7. Start development server:
+7. Start the server:
 
 ```bash
 npm run dev
 ```
+
+Use `npm start` to run without file watching (production-style: `node src/server.js`).
 
 8. API should now be available at:
 
@@ -80,26 +82,32 @@ PORT=5000
 
 ## API Documentation
 
-All successful responses use a `data` wrapper, for example:
+HTTP routes are mounted under **`/api`**. The app also serves uploaded files from **`/uploads`** (static).
+
+All **successful** JSON responses use a `data` wrapper, for example:
 
 ```json
 { "data": { "...": "..." } }
 ```
 
+Error responses use **`{ "error": "message" }`** (no `data` field) with an appropriate HTTP status code (e.g. `400`, `401`, `403`, `404`).
+
+Send `Authorization: Bearer <token>` for protected routes.
+
 ### Auth (`/api/auth`)
 
 | Method | Endpoint | Auth Required | Description |
 |---|---|---|---|
-| POST | `/api/auth/register` | No | Register a new user (`STUDENT` or `INSTRUCTOR`) |
-| POST | `/api/auth/login` | No | Login and receive JWT token |
+| POST | `/api/auth/register` | No | Register a new user. Body: `name`, `email`, `password`, `role` (`STUDENT` or `INSTRUCTOR`) |
+| POST | `/api/auth/login` | No | Login. Body: `email`, `password`. Returns `user` and `token` inside `data` |
 
 ### Courses (`/api/courses`)
 
 | Method | Endpoint | Auth Required | Description |
 |---|---|---|---|
-| GET | `/api/courses` | No | List published courses with optional `search`, `category`, `difficulty` filters |
+| GET | `/api/courses` | No | List **published** courses. Optional query params: `search`, `category`, `difficulty` (see notes below) |
 | GET | `/api/courses/my` | Yes (Instructor) | List courses created by logged-in instructor |
-| GET | `/api/courses/:id` | No | Get course details with full syllabus |
+| GET | `/api/courses/:id` | Optional | Get course details with full syllabus (modules, lectures, resources, module quizzes). **Published** courses are public. **Draft** courses return `404` unless the caller is the **owning instructor** (use `Authorization: Bearer`) |
 | POST | `/api/courses` | Yes (Instructor) | Create a new course (default status `DRAFT`) |
 | PUT | `/api/courses/:id` | Yes (Instructor) | Update an instructor-owned course |
 | DELETE | `/api/courses/:id` | Yes (Instructor) | Delete an instructor-owned course |
@@ -130,7 +138,7 @@ All successful responses use a `data` wrapper, for example:
 | Method | Endpoint | Auth Required | Description |
 |---|---|---|---|
 | GET | `/api/resources/lecture/:lectureId` | No | List lecture resources |
-| POST | `/api/resources` | Yes (Instructor) | Upload and create resource (multipart form-data with file) |
+| POST | `/api/resources` | Yes (Instructor) | Create resource: `multipart/form-data` with `file` (required) plus `lectureId` and `title` (form fields) |
 | DELETE | `/api/resources/:id` | Yes (Instructor) | Delete resource |
 
 ### Enrollments (`/api/enrollments`)
@@ -148,9 +156,9 @@ All successful responses use a `data` wrapper, for example:
 |---|---|---|---|
 | GET | `/api/progress/course/:courseId` | Yes | Course progress summary |
 | GET | `/api/progress/course/:courseId/details` | Yes | Per-lecture completion map |
-| GET | `/api/progress/course/:courseId/next` | Yes | Next incomplete lecture |
-| POST | `/api/progress` | Yes | Mark lecture completion (`isComplete` optional) |
-| PUT | `/api/progress/:lectureId` | Yes | Update lecture completion |
+| GET | `/api/progress/course/:courseId/next` | Yes | Next incomplete lecture (see response shape in Notes) |
+| POST | `/api/progress` | Yes | Mark lecture completion. Body: `lectureId` (required), `isComplete` (optional, default `true`) |
+| PUT | `/api/progress/:lectureId` | Yes | Update lecture completion. Body: `isComplete` |
 
 ### Quizzes (`/api/quizzes`)
 
@@ -166,6 +174,7 @@ All successful responses use a `data` wrapper, for example:
 | DELETE | `/api/quizzes/questions/:questionId` | Yes (Instructor) | Delete question |
 | POST | `/api/quizzes/:id/attempt` | Yes | Submit quiz attempt for grading |
 | GET | `/api/quizzes/:id/attempts/my` | Yes | Get current user attempts for quiz |
+| POST | `/api/quizzes/:id/publish` | Yes (Instructor) | Publish a quiz (owner instructor only) |
 
 ### Certificates (`/api/certificates`)
 
@@ -359,8 +368,38 @@ Body:
 
 ## Notes
 
-- Resource upload endpoint expects `multipart/form-data` with a `file` field, not JSON.
-- Uploaded files are served from `/uploads`.
+### Published course list (`GET /api/courses`)
+
+- Query parameters (all optional):
+  - **`search`** – matches course title, description, category (substring, case-insensitive), or instructor name.
+  - **`category`** – case-insensitive **exact** match on the course `category` string (as stored in the database).
+  - **`difficulty`** – one of `BEGINNER`, `INTERMEDIATE`, `ADVANCED` (must match the stored enum value).
+
+### Progress
+
+- `GET /api/progress/course/:courseId` returns a summary including **`totalLectures`**, **`completedLectures`**, **`percentage`**, and **`completedLectureIds`**.
+- `GET /api/progress/course/:courseId/details` returns an array of `{ "lectureId", "isComplete" }` for every lecture in the course.
+- **`GET /api/progress/course/:courseId/next`** response: `{ "data": { "lecture": { ... } | null } }`. If every lecture is complete, `lecture` is `null`.
+
+### Enrollments
+
+- `POST /api/enrollments` body: `{ "courseId": <number> }` (must be a **published** course the user is not already enrolled in). Returns `409` if already enrolled.
+- `GET /api/enrollments/check/:courseId` returns `{ "data": { "enrolled": true | false } }`.
+- `GET /api/enrollments/my` returns each enrollment with **`totalLectures`**, **`completedLectures`**, and **`completionPercentage`** (computed server-side).
+
+### Quizzes
+
+- `GET /api/quizzes/module/:moduleId` and `GET /api/quizzes/:id` are unauthenticated; use them to load quiz content for display.
+- `POST /api/quizzes/:id/attempt` requires **authentication** (`Authorization: Bearer`). Body: `{ "answers": [ { "questionId": <number>, "selectedOptionId": <number> }, ... ] }`.
+
+### Static files and CORS
+
+- Resource upload endpoint expects `multipart/form-data` with a `file` field, not JSON; additional fields such as `lectureId` and `title` are sent as form fields (see `resource.routes.js`).
+- Uploaded files are served from **`/uploads`** (URL prefix on the same host as the API, e.g. `http://localhost:5000/uploads/...`).
+- The API uses **CORS** with a permissive default for development; tighten for production as needed.
+
+### Certificates
+
 - Certificate IDs follow this format:
 
 ```text
