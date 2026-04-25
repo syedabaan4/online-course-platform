@@ -9,6 +9,7 @@ import {
 	markLectureComplete,
 } from '../../api/progress.api';
 import { getMyAttempts } from '../../api/quiz.api';
+import { checkCompletion } from '../../api/certificate.api';
 import { showError, showSuccess } from '../../components/Toast';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { useAuth } from '../../context/AuthContext';
@@ -118,6 +119,7 @@ const CoursePlayer = () => {
 	const [markError, setMarkError] = useState('');
 	const [isMarking, setIsMarking] = useState(false);
 	const [showCertBanner, setShowCertBanner] = useState(false);
+	const [courseFullyComplete, setCourseFullyComplete] = useState(false);
 
 	const sortedModules = useMemo(() => {
 		if (!course?.modules) {
@@ -176,6 +178,7 @@ const CoursePlayer = () => {
 		setProgressError('');
 		setMarkError('');
 		setShowCertBanner(false);
+		setCourseFullyComplete(false);
 		try {
 			const cRes = await getCourseById(courseId);
 			const c = normalizePayload(cRes);
@@ -207,6 +210,14 @@ const CoursePlayer = () => {
 			setOverallProgress(progress);
 			if (progress?.totalLectures > 0 && progress.completedLectures >= progress.totalLectures) {
 				setShowCertBanner(true);
+			}
+
+			try {
+				const chkRes = await checkCompletion(courseId);
+				const chk = normalizePayload(chkRes);
+				setCourseFullyComplete(Boolean(chk?.completed));
+			} catch {
+				setCourseFullyComplete(false);
 			}
 
 			let nextLectureId = null;
@@ -363,6 +374,13 @@ const CoursePlayer = () => {
 			showSuccess('Lecture marked complete.');
 			if (p?.totalLectures > 0 && p.completedLectures >= p.totalLectures) {
 				setShowCertBanner(true);
+			}
+			try {
+				const chkRes = await checkCompletion(courseId);
+				const chk = normalizePayload(chkRes);
+				setCourseFullyComplete(Boolean(chk?.completed));
+			} catch {
+				setCourseFullyComplete(false);
 			}
 		} catch (e) {
 			setMarkError(String(e));
@@ -784,9 +802,9 @@ const CoursePlayer = () => {
 								boxSizing: 'border-box',
 							}}
 						>
-							{showCertBanner ? (
+							{showCertBanner && courseFullyComplete ? (
 								<Link
-									to="/certificates"
+									to={`/learn/${courseId}/complete`}
 									style={{
 										display: 'block',
 										padding: 16,
@@ -798,8 +816,22 @@ const CoursePlayer = () => {
 										textDecoration: 'none',
 									}}
 								>
-									🎓 Course complete! Get your certificate →
+									Course complete! View celebration and get your certificate →
 								</Link>
+							) : showCertBanner ? (
+								<div
+									style={{
+										padding: 16,
+										borderRadius: 8,
+										background: 'var(--bg-elevated)',
+										color: 'var(--text-secondary)',
+										fontWeight: 500,
+										fontSize: 14,
+										textAlign: 'center',
+									}}
+								>
+									All lectures complete. Pass all published module quizzes to finish the course and unlock your certificate.
+								</div>
 							) : null}
 							<div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
 								<div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16 }}>
