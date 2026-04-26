@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -7,6 +7,32 @@ const Navbar = () => {
 	const location = useLocation();
 	const { user, isLoading, isAuthenticated, isInstructor, logout } = useAuth();
 	const [actionError, setActionError] = useState('');
+	const [userMenuOpen, setUserMenuOpen] = useState(false);
+	const userMenuRef = useRef(null);
+
+	const closeUserMenu = useCallback(() => {
+		setUserMenuOpen(false);
+	}, []);
+
+	useEffect(() => {
+		if (!userMenuOpen) return;
+
+		const onDown = (e) => {
+			if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+				setUserMenuOpen(false);
+			}
+		};
+		const onKey = (e) => {
+			if (e.key === 'Escape') setUserMenuOpen(false);
+		};
+
+		document.addEventListener('mousedown', onDown);
+		document.addEventListener('keydown', onKey);
+		return () => {
+			document.removeEventListener('mousedown', onDown);
+			document.removeEventListener('keydown', onKey);
+		};
+	}, [userMenuOpen]);
 
 	const navLinks = useMemo(() => {
 		if (!isAuthenticated) {
@@ -30,6 +56,7 @@ const Navbar = () => {
 	const handleLogout = async () => {
 		setActionError('');
 		try {
+			closeUserMenu();
 			await logout();
 			navigate('/login');
 		} catch (error) {
@@ -88,43 +115,8 @@ const Navbar = () => {
 				) : (
 					<>
 						<div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', gap: '32px' }}>
-							<Link to="/" style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', gap: '8px' }}>
-								<div
-									style={{
-										width: '36px',
-										height: '36px',
-										background: 'var(--accent-bg)',
-										borderRadius: 'var(--radius)',
-										display: 'flex',
-										justifyContent: 'center',
-										alignItems: 'center',
-										color: 'var(--accent)',
-										fontFamily: 'var(--font)',
-										fontWeight: 700,
-										fontSize: '16px',
-										lineHeight: '20px',
-									}}
-								>
-									C
-								</div>
-								<div style={{ display: 'inline-flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start' }}>
-									<div
-										style={{
-											width: '76px',
-											height: '28px',
-											display: 'flex',
-											flexDirection: 'column',
-											justifyContent: 'center',
-											color: 'var(--text-primary)',
-											fontSize: '20px',
-											fontFamily: 'var(--font)',
-											fontWeight: 700,
-											lineHeight: '28px',
-										}}
-									>
-										Coursly
-									</div>
-								</div>
+							<Link to="/" className="navbar-logo">
+								Coursly<span className="navbar-logo__period" aria-hidden="true">.</span>
 							</Link>
 
 							<div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', gap: '24px' }}>
@@ -135,36 +127,9 @@ const Navbar = () => {
 										<Link
 											key={link.to}
 											to={link.to}
-											style={{
-												paddingLeft: '12px',
-												paddingRight: '12px',
-												paddingTop: '8px',
-												paddingBottom: '8px',
-												borderRadius: 'var(--radius)',
-												display: 'inline-flex',
-												flexDirection: 'column',
-												justifyContent: 'flex-start',
-												alignItems: 'flex-start',
-												background: isActive ? 'var(--accent-bg)' : 'transparent',
-											}}
+											className={isActive ? 'navbar-nav-link navbar-nav-link--active' : 'navbar-nav-link'}
 										>
-											<span
-												style={{
-													height: '20px',
-													display: 'flex',
-													flexDirection: 'column',
-													justifyContent: 'center',
-													textAlign: 'center',
-													color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
-													fontSize: '14px',
-													fontFamily: 'var(--font)',
-													fontWeight: 500,
-													lineHeight: '20px',
-													whiteSpace: 'nowrap',
-												}}
-											>
-												{link.label}
-											</span>
+											<span className="navbar-nav-link__label">{link.label}</span>
 										</Link>
 									);
 								})}
@@ -173,85 +138,43 @@ const Navbar = () => {
 
 						<div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', gap: '16px' }}>
 							{isAuthenticated ? (
-								<>
-									<div
-										style={{
-											padding: '8px',
-											position: 'relative',
-											display: 'inline-flex',
-											justifyContent: 'center',
-											alignItems: 'center',
-											color: 'var(--text-muted)',
-										}}
-										aria-label="notifications"
+								<div ref={userMenuRef} className="navbar-user-menu" style={{ position: 'relative' }}>
+									<button
+										type="button"
+										className="navbar-user-menu__trigger"
+										aria-haspopup="menu"
+										aria-expanded={userMenuOpen}
+										onClick={() => setUserMenuOpen((o) => !o)}
 									>
-										<svg width="16" height="20" viewBox="0 0 16 20" fill="none" aria-hidden="true">
-											<path
-												d="M8 1.5C5.23858 1.5 3 3.73858 3 6.5V9.24872C3 10.1165 2.7155 10.9604 2.18973 11.651L0.98058 13.2394C0.399574 14.0026 0.943844 15.1 1.90267 15.1H14.0973C15.0562 15.1 15.6004 14.0026 15.0194 13.2394L13.8103 11.651C13.2845 10.9604 13 10.1165 13 9.24872V6.5C13 3.73858 10.7614 1.5 8 1.5Z"
-												fill="currentColor"
-											/>
-											<path d="M6 17.1C6 18.2046 6.89543 19.1 8 19.1C9.10457 19.1 10 18.2046 10 17.1" fill="currentColor" />
-										</svg>
 										<div
-											style={{
-												width: '8px',
-												height: '8px',
-												position: 'absolute',
-												left: '16px',
-												top: '8px',
-												background: 'var(--error)',
-												borderRadius: 'var(--radius-pill)',
-												border: '2px solid var(--bg-surface)',
-											}}
-										/>
-									</div>
-
-									<div
-										style={{
-											width: '1px',
-											height: '32px',
-											background: 'var(--border)',
-										}}
-									/>
-
-									<div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', gap: '12px' }}>
-										<div style={{ display: 'inline-flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: '4px' }}>
-											<div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-end' }}>
-												<div
-													style={{
-														textAlign: 'right',
-														display: 'flex',
-														flexDirection: 'column',
-														justifyContent: 'center',
-														color: 'var(--text-primary)',
-														fontSize: '14px',
-														fontFamily: 'var(--font)',
-														fontWeight: 600,
-														lineHeight: '14px',
-													}}
-												>
-													{displayName}
-												</div>
-											</div>
-											<div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-end' }}>
-												<div
-													style={{
-														textAlign: 'right',
-														display: 'flex',
-														flexDirection: 'column',
-														justifyContent: 'center',
-														color: 'var(--text-muted)',
-														fontSize: '12px',
-														fontFamily: 'var(--font)',
-														fontWeight: 400,
-														lineHeight: '16px',
-													}}
-												>
-													{roleLabel}
-												</div>
-											</div>
+											className="navbar-user-menu__text"
+											style={{ display: 'inline-flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-end', gap: '4px' }}
+										>
+											<span
+												style={{
+													color: 'var(--text-primary)',
+													fontSize: '14px',
+													fontFamily: 'var(--font)',
+													fontWeight: 600,
+													lineHeight: '14px',
+												}}
+											>
+												{displayName}
+											</span>
+											<span
+												style={{
+													color: 'var(--text-muted)',
+													fontSize: '12px',
+													fontFamily: 'var(--font)',
+													fontWeight: 400,
+													lineHeight: '16px',
+												}}
+											>
+												{roleLabel}
+											</span>
 										</div>
 										<div
+											className="navbar-user-menu__avatar"
 											style={{
 												width: '40px',
 												height: '40px',
@@ -271,11 +194,36 @@ const Navbar = () => {
 										>
 											{initials || 'U'}
 										</div>
-										<button type="button" className="btn-secondary btn-sm" onClick={handleLogout}>
-											Logout
-										</button>
-									</div>
-								</>
+									</button>
+									{userMenuOpen ? (
+										<div
+											className="navbar-user-menu__panel"
+											role="menu"
+											aria-orientation="vertical"
+											style={{
+												position: 'absolute',
+												top: 'calc(100% + 8px)',
+												right: 0,
+												minWidth: '160px',
+												padding: '4px',
+												background: 'var(--bg-surface)',
+												border: '1px solid var(--border)',
+												borderRadius: 'var(--radius)',
+												boxShadow: 'var(--shadow-elevated)',
+												zIndex: 200,
+											}}
+										>
+											<button
+												type="button"
+												role="menuitem"
+												className="navbar-user-menu__item"
+												onClick={handleLogout}
+											>
+												Log out
+											</button>
+										</div>
+									) : null}
+								</div>
 							) : (
 								<div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
 									<button type="button" className="btn-secondary btn-sm" onClick={() => navigate('/login')}>

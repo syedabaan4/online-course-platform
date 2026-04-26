@@ -409,3 +409,104 @@ a {
   border: none;
   margin: 0;
 }
+
+/* Navbar */
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  color: var(--text-primary);
+  font-size: 20px;
+  font-family: var(--font);
+  font-weight: 700;
+  line-height: 28px;
+  text-decoration: none;
+}
+
+.navbar-logo__period {
+  color: #e11d48;
+  font-weight: 800;
+}
+
+.navbar-nav-link {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  text-decoration: none;
+  color: var(--text-secondary);
+  background: transparent;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.navbar-nav-link:hover {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+
+.navbar-nav-link--active {
+  background: color-mix(in srgb, var(--text-primary) 10%, var(--bg-surface));
+  color: var(--text-primary);
+}
+
+.navbar-nav-link--active:hover {
+  background: color-mix(in srgb, var(--text-primary) 12%, var(--bg-surface));
+  color: var(--text-primary);
+}
+
+.navbar-nav-link__label {
+  height: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  font-size: 14px;
+  font-family: var(--font);
+  font-weight: 500;
+  line-height: 20px;
+  white-space: nowrap;
+  color: inherit;
+}
+
+.navbar-user-menu__trigger {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 6px 8px;
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+  color: inherit;
+  transition: background-color 0.15s ease;
+}
+
+.navbar-user-menu__trigger:hover {
+  background: var(--bg-elevated);
+}
+
+.navbar-user-menu__item {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 8px 12px;
+  border: none;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  text-align: left;
+  font-size: 14px;
+  font-family: var(--font);
+  font-weight: 500;
+  line-height: 20px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.navbar-user-menu__item:hover {
+  background: var(--bg-elevated);
+}
