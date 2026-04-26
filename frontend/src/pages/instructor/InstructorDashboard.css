@@ -16,9 +16,10 @@
 }
 
 .dashboard-stat-icon {
-	width: 44px;
-	height: 44px;
-	border-radius: var(--radius);
+	padding: 8px;
+	border-radius: var(--radius-sm);
+	background: var(--bg-elevated);
+	color: var(--text-primary);
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -26,6 +27,24 @@
 }
 
 .dashboard-stat-icon svg {
-	width: 22px;
-	height: 22px;
+	width: 20px;
+	height: 20px;
+	display: block;
+}
+
+.card.instructor-dashboard-stat-card {
+	width: 100%;
+	padding: 24px;
+	border-radius: var(--radius-sm);
+}
+
+.card.instructor-dashboard-courses-card {
+	align-self: stretch;
+	padding: 0;
+	border-radius: var(--radius-sm);
+	overflow: hidden;
+}
+
+.instructor-dashboard-courses-card .instructor-course-actions :is(.btn-primary, .btn-secondary, .btn-danger) {
+	border-radius: var(--radius-sm);
 }

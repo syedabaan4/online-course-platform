@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { createCourse, getCourseById, updateCourse } from '../../api/course.api';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { showError, showSuccess } from '../../components/Toast';
+import './CourseForm.css';
 
 const categories = ['Development', 'Design', 'Business', 'Marketing', 'Data Science'];
 const difficulties = ['BEGINNER', 'INTERMEDIATE', 'ADVANCED'];
@@ -214,7 +215,7 @@ const CourseForm = () => {
 					{heading}
 				</h1>
 
-				<form className="card" onSubmit={handleSubmit} style={{ padding: '32px', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+				<form className="card card-elevated-surface" onSubmit={handleSubmit} style={{ padding: '32px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
 					<div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
 						<label className="label" htmlFor="title" style={{ fontSize: '16px', lineHeight: '24px' }}>
 							Course Title <span style={{ color: 'var(--error)' }}>*</span>
@@ -320,9 +321,9 @@ const CourseForm = () => {
 					<div style={{ paddingTop: '8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
 						<button
 							type="submit"
-							className="btn-primary"
+							className="btn-primary course-form__submit"
 							disabled={isSubmitting}
-							style={{ minWidth: '240px', justifyContent: 'center', opacity: isSubmitting ? 0.8 : 1, cursor: isSubmitting ? 'not-allowed' : 'pointer' }}
+							style={{ justifyContent: 'center', opacity: isSubmitting ? 0.8 : 1, cursor: isSubmitting ? 'not-allowed' : 'pointer' }}
 						>
 							{isSubmitting ? <div className="spinner" style={{ width: '16px', height: '16px', borderWidth: '2px', margin: 0 }} /> : 'Save & Continue'}
 						</button>

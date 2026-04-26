@@ -73,6 +73,12 @@
   --shadow-footer-up: 0 -4px 15px rgba(0, 0, 0, 0.02);
   --shadow-subtle-elevation: 0 2px 10px rgba(0, 0, 0, 0.03);
   --shadow-accent-icon-ring: 0 0 0 1px var(--accent-badge-bg);
+  --shadow-elevated-surface:
+    0 1px 2px color-mix(in srgb, var(--text-primary) 4%, transparent),
+    0 4px 14px color-mix(in srgb, var(--text-primary) 5%, transparent);
+  --shadow-elevated-surface-hover:
+    0 4px 12px color-mix(in srgb, var(--text-primary) 8%, transparent),
+    0 20px 48px color-mix(in srgb, var(--text-primary) 12%, transparent);
 
   /* Typography */
   --font: 'Inter', sans-serif;
@@ -494,6 +500,24 @@ a {
   box-shadow: var(--shadow-elevated);
 }
 
+.card.card-elevated-surface {
+  border: none;
+  box-shadow: var(--shadow-elevated-surface);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.card.card-elevated-surface:hover {
+  box-shadow: var(--shadow-elevated-surface-hover);
+  transform: translateY(-2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card.card-elevated-surface,
+  .card.card-elevated-surface:hover {
+    transform: none;
+  }
+}
+
 .card.course-quiz-preview-card {
   border: none;
   box-shadow: var(--shadow-card);
@@ -523,14 +547,12 @@ a {
   background: var(--bg-surface);
   border: none;
   border-radius: var(--radius-sm);
-  box-shadow: 0 1px 2px color-mix(in srgb, var(--text-primary) 4%, transparent),
-    0 4px 14px color-mix(in srgb, var(--text-primary) 5%, transparent);
+  box-shadow: var(--shadow-elevated-surface);
   transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 
 .course-card:hover {
-  box-shadow: 0 2px 6px color-mix(in srgb, var(--text-primary) 6%, transparent),
-    0 16px 40px color-mix(in srgb, var(--text-primary) 9%, transparent);
+  box-shadow: var(--shadow-elevated-surface-hover);
   transform: translateY(-2px);
 }
 
@@ -554,14 +576,12 @@ a {
   background: var(--bg-surface);
   border: none;
   border-radius: var(--radius-sm);
-  box-shadow: 0 1px 2px color-mix(in srgb, var(--text-primary) 4%, transparent),
-    0 4px 14px color-mix(in srgb, var(--text-primary) 5%, transparent);
+  box-shadow: var(--shadow-elevated-surface);
   transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 
 .course-detail-aside-card:hover {
-  box-shadow: 0 2px 6px color-mix(in srgb, var(--text-primary) 6%, transparent),
-    0 16px 40px color-mix(in srgb, var(--text-primary) 9%, transparent);
+  box-shadow: var(--shadow-elevated-surface-hover);
   transform: translateY(-2px);
 }
 

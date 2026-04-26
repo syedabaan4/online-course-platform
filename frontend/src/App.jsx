@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import InstructorRoute from './components/InstructorRoute';
 import ProtectedRoute from './components/ProtectedRoute';
+import ConfirmProvider from './components/ConfirmProvider';
 import { AuthProvider } from './context/AuthContext';
 
 const Home = lazy(() => import('./pages/Home.jsx'));
@@ -25,6 +26,7 @@ const NotFound = lazy(() => import('./pages/NotFound.jsx'));
 const App = () => {
   return (
     <AuthProvider>
+      <ConfirmProvider>
       <BrowserRouter>
         <Navbar />
 
@@ -143,6 +145,7 @@ const App = () => {
           </Routes>
         </Suspense>
       </BrowserRouter>
+      </ConfirmProvider>
     </AuthProvider>
   );
 };

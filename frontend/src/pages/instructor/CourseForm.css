@@ -1,0 +1,8 @@
+form.card.card-elevated-surface {
+	border-radius: var(--radius-sm);
+}
+
+.btn-primary.course-form__submit {
+	padding: 12px 18px;
+	min-width: 0;
+}
