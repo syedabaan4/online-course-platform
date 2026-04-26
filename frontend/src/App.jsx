@@ -16,6 +16,7 @@ const MyCourses = lazy(() => import('./pages/student/MyCourses.jsx'));
 const CoursePlayer = lazy(() => import('./pages/student/CoursePlayer.jsx'));
 const MyCertificates = lazy(() => import('./pages/student/MyCertificates.jsx'));
 const CertificateView = lazy(() => import('./pages/student/CertificateView.jsx'));
+const CertificateVerify = lazy(() => import('./pages/student/CertificateVerify.jsx'));
 const QuizPlayer = lazy(() => import('./pages/student/QuizPlayer.jsx'));
 const CourseCompleted = lazy(() => import('./pages/student/CourseCompleted.jsx'));
 const InstructorDashboard = lazy(() => import('./pages/instructor/InstructorDashboard.jsx'));
@@ -53,6 +54,7 @@ const App = () => {
                 <Route path="/register" element={<Register />} />
                 <Route path="/courses" element={<CourseCatalog />} />
                 <Route path="/courses/:id" element={<CourseDetail />} />
+                <Route path="/verify/:certificateId" element={<CertificateVerify />} />
 
                 <Route
                   path="/my-courses"

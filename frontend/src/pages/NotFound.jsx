@@ -2,95 +2,27 @@ import { Link } from 'react-router-dom';
 
 const NotFound = () => {
 	return (
-		<div
-			style={{
-				minHeight: '100vh',
-				width: '100%',
-				background: 'var(--bg-primary)',
-				display: 'flex',
-				alignItems: 'center',
-				justifyContent: 'center',
-				padding: '24px',
-				fontFamily: 'var(--font)',
-			}}
-		>
-			<div
-				style={{
-					width: '100%',
-					maxWidth: '720px',
-					background: 'color-mix(in srgb, var(--bg-surface) 88%, transparent)',
-					border: '1px solid var(--border)',
-					borderRadius: 'var(--radius-lg)',
-					backdropFilter: 'blur(6px)',
-					boxShadow: 'var(--shadow-card)',
-					padding: '56px 40px',
-					display: 'flex',
-					flexDirection: 'column',
-					alignItems: 'center',
-					textAlign: 'center',
-					gap: '12px',
-				}}
-			>
-				<div
-					style={{
-						fontSize: '96px',
-						lineHeight: '96px',
-						fontWeight: 700,
-						color: 'var(--text-primary)',
-						letterSpacing: '-1px',
-					}}
-				>
-					404
+		<main className="page-fade not-found-page">
+			<div className="not-found-page__inner">
+				<div className="card card-elevated-surface not-found-page__card">
+					<div className="not-found-page__code" aria-hidden>
+						404
+					</div>
+					<h1 className="not-found-page__title">Page not found</h1>
+					<p className="not-found-page__lead">
+						The page you are looking for does not exist or may have been moved.
+					</p>
+					<div className="not-found-page__actions">
+						<Link to="/" className="btn-primary">
+							Go home
+						</Link>
+						<Link to="/courses" className="btn-secondary">
+							Browse courses
+						</Link>
+					</div>
 				</div>
-
-				<h1
-					style={{
-						margin: 0,
-						color: 'var(--text-primary)',
-						fontSize: '32px',
-						lineHeight: '40px',
-						fontWeight: 700,
-						fontFamily: 'var(--font)',
-					}}
-				>
-					Page Not Found
-				</h1>
-
-				<p
-					style={{
-						margin: 0,
-						color: 'var(--text-muted)',
-						fontSize: '16px',
-						lineHeight: '24px',
-						maxWidth: '520px',
-					}}
-				>
-					The page you are looking for does not exist or may have been moved.
-				</p>
-
-				<Link
-					to="/"
-					style={{
-						marginTop: '12px',
-						display: 'inline-flex',
-						alignItems: 'center',
-						justifyContent: 'center',
-						padding: '12px 24px',
-						borderRadius: 'var(--radius)',
-						background: 'var(--accent)',
-						color: 'var(--bg-surface)',
-						textDecoration: 'none',
-						fontSize: '14px',
-						lineHeight: '20px',
-						fontWeight: 600,
-						fontFamily: 'var(--font)',
-						transition: 'background 0.15s ease',
-					}}
-				>
-					Go Home
-				</Link>
 			</div>
-		</div>
+		</main>
 	);
 };
 
