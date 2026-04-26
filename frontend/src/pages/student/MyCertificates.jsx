@@ -36,11 +36,11 @@ const MyCertificates = () => {
 	if (isLoading) {
 		return (
 			<main
-				className="page-fade"
+				className="page-fade my-certificates-page"
 				style={{
 					...font,
 					minHeight: 'calc(100vh - 64px)',
-					background: 'var(--bg-surface-alt)',
+					background: 'var(--bg-primary)',
 					display: 'flex',
 					alignItems: 'center',
 					justifyContent: 'center',
@@ -53,20 +53,22 @@ const MyCertificates = () => {
 
 	return (
 		<div
-			className="page-fade"
+			className="page-fade my-certificates-page"
 			style={{
 				...font,
 				minHeight: 'calc(100vh - 64px)',
-				background: 'var(--bg-surface-alt)',
-				padding: '32px 24px 48px',
+				background: 'var(--bg-primary)',
 				boxSizing: 'border-box',
 			}}
 		>
-			<div style={{ width: '100%', maxWidth: 1024, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24 }}>
+			<div
+				className="course-quiz-preview-wrap"
+				style={{ width: '100%', maxWidth: 1024, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 24, boxSizing: 'border-box' }}
+			>
 				<header
 					style={{
 						paddingBottom: 24,
-						borderBottom: '1px solid var(--border)',
+						borderBottom: '1px solid var(--border-light)',
 						display: 'flex',
 						flexDirection: 'column',
 						gap: 4,
@@ -99,11 +101,11 @@ const MyCertificates = () => {
 				)}
 
 				{!list.length && !loadError ? (
-					<div className="empty-state" style={{ minHeight: 200 }}>
-						<p style={{ color: 'var(--text-secondary)', fontSize: 16, maxWidth: 400, margin: 0 }}>
+					<div className="card card-elevated-surface course-quiz-preview-card my-certificates-empty-card">
+						<p style={{ color: 'var(--text-secondary)', fontSize: 16, maxWidth: 400, margin: 0, textAlign: 'center' }}>
 							You do not have any certificates yet. Finish a course and pass all module quizzes to earn one.
 						</p>
-						<Link to="/my-courses" className="btn-primary" style={{ marginTop: 8 }}>
+						<Link to="/my-courses" className="btn-primary">
 							Go to My Learning
 						</Link>
 					</div>
@@ -142,14 +144,13 @@ function CertificateListCard({ row }) {
 
 	return (
 		<div
-			className="card"
+			className="card card-elevated-surface course-quiz-preview-card my-certificates-list-card"
 			style={{
 				display: 'flex',
 				flexWrap: 'wrap',
 				alignItems: 'center',
 				justifyContent: 'space-between',
 				gap: 16,
-				padding: 20,
 			}}
 		>
 			<div style={{ minWidth: 0, flex: '1 1 240px' }}>
@@ -162,7 +163,7 @@ function CertificateListCard({ row }) {
 					style={{
 						marginTop: 8,
 						fontSize: 12,
-						fontFamily: 'ui-monospace, monospace',
+						fontFamily: 'var(--font-mono)',
 						color: 'var(--text-secondary)',
 						letterSpacing: '0.4px',
 					}}
@@ -170,11 +171,7 @@ function CertificateListCard({ row }) {
 					{cid}
 				</div>
 			</div>
-			<Link
-				to={href}
-				className="btn-primary"
-				style={{ fontSize: 14, padding: '10px 20px', textDecoration: 'none', display: 'inline-flex' }}
-			>
+			<Link to={href} className="btn-primary">
 				View certificate
 			</Link>
 		</div>

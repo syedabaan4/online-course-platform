@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { generateCertificate } from '../../api/certificate.api';
 import { getCourseById } from '../../api/course.api';
@@ -380,50 +381,34 @@ function InfoView({ quiz, attemptsSorted, attemptsError, totalQuestions, moduleI
 
 	return (
 		<div
+			className="course-quiz-preview-wrap"
 			style={{
 				maxWidth: 768,
 				margin: '0 auto',
-				padding: '32px 24px 64px',
 				display: 'flex',
 				flexDirection: 'column',
 				gap: 24,
+				boxSizing: 'border-box',
 			}}
 		>
-			<div
-				className="card"
-				style={{
-					borderRadius: 16,
-					display: 'flex',
-					flexDirection: 'column',
-					gap: 16,
-					boxShadow: 'var(--shadow-card)',
-					border: '1px solid var(--border)',
-				}}
-			>
-				<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 8 }}>
-					<div className="badge badge-blue" style={{ color: 'var(--text-primary)' }}>
-						{moduleLabel}
-					</div>
-					<h1 style={{ color: 'var(--text-primary)', fontSize: 30, fontWeight: 900, lineHeight: 1.2, margin: 0 }}>{quiz.title}</h1>
+			<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 8 }}>
+				<div className="badge badge-blue" style={{ color: 'var(--text-primary)' }}>
+					{moduleLabel}
 				</div>
-				<p style={{ color: 'var(--text-secondary)', fontSize: 16, margin: 0, lineHeight: 1.5 }}>
+				<h1 style={{ color: 'var(--text-primary)', fontSize: 30, fontWeight: 900, lineHeight: 1.2, margin: 0 }}>{quiz.title}</h1>
+			</div>
+			<p style={{ color: 'var(--text-secondary)', fontSize: 16, margin: 0, lineHeight: 1.5, maxWidth: 720 }}>
+				Review your attempts below, then start the quiz when you are ready.
+				<br />
+				<span style={{ color: 'var(--text-muted)', fontSize: 15 }}>
 					{totalQuestions} {totalQuestions === 1 ? 'question' : 'questions'}
 					{' · '}
 					Passing score: {quiz.passingScore}%
-				</p>
-			</div>
+				</span>
+			</p>
 
-			<div
-				className="card"
-				style={{
-					borderRadius: 16,
-					padding: 0,
-					overflow: 'hidden',
-					boxShadow: 'var(--shadow-card)',
-					border: '1px solid var(--border)',
-				}}
-			>
-				<div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)' }}>
+			<div className="card card-elevated-surface course-quiz-preview-card" style={{ padding: 0, overflow: 'hidden' }}>
+				<div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border-light)' }}>
 					<h2 style={{ color: 'var(--text-primary)', fontSize: 18, fontWeight: 700, margin: 0 }}>Your attempts</h2>
 				</div>
 				{attemptsError && (
@@ -461,13 +446,28 @@ function InfoView({ quiz, attemptsSorted, attemptsError, totalQuestions, moduleI
 				)}
 			</div>
 
-			<div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-				<button type="button" className="btn-primary" onClick={onStart}>
-					{attemptsSorted.length > 0 ? 'Retake Quiz' : 'Start Quiz'}
-				</button>
-				<Link to={`/learn/${courseId}`} className="btn-secondary" style={{ display: 'inline-flex' }}>
-					Back to course
-				</Link>
+			<div
+				className="card course-quiz-preview-card"
+				style={{
+					textAlign: 'center',
+					padding: '28px 24px 28px',
+				}}
+			>
+				<h2 style={{ color: 'var(--text-primary)', fontSize: 22, fontWeight: 800, margin: '0 0 12px' }}>Ready to start?</h2>
+				<p style={{ color: 'var(--text-secondary)', fontSize: 15, lineHeight: 1.6, margin: '0 0 24px' }}>
+					The quiz will begin as soon as you choose Start. You can return to the course at any time.
+				</p>
+				<div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
+					<button type="button" className="btn-primary" onClick={onStart}>
+						{attemptsSorted.length > 0 ? 'Retake quiz' : 'Start quiz'}
+						<svg width="16" height="16" viewBox="0 0 24 24" style={{ marginLeft: 4 }} aria-hidden>
+							<path fill="currentColor" d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8-8-8z" />
+						</svg>
+					</button>
+					<Link to={`/learn/${courseId}`} className="btn-secondary" style={{ display: 'inline-flex' }}>
+						Back to course
+					</Link>
+				</div>
 			</div>
 		</div>
 	);
@@ -492,13 +492,14 @@ function TakingView({
 	return (
 		<div style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 64px)' }}>
 			<div
+				className="course-quiz-preview-wrap is-quiz-taking"
 				style={{
 					flex: 1,
 					overflow: 'auto',
-					padding: '32px 24px 24px',
 					display: 'flex',
 					justifyContent: 'center',
 					alignItems: 'flex-start',
+					boxSizing: 'border-box',
 				}}
 			>
 				<div
@@ -507,17 +508,14 @@ function TakingView({
 						maxWidth: 768,
 						display: 'flex',
 						flexDirection: 'column',
-						gap: 32,
+						gap: 24,
 					}}
 				>
 					<div
+						className="card card-elevated-surface course-quiz-preview-card"
 						style={{
 							width: '100%',
 							padding: 24,
-							background: 'var(--bg-surface)',
-							borderRadius: 16,
-							boxShadow: 'var(--shadow-card)',
-							border: '1px solid var(--border)',
 							display: 'flex',
 							flexDirection: 'column',
 							gap: 16,
@@ -566,7 +564,7 @@ function TakingView({
 						</div>
 						<div
 							className="progress-bar"
-							style={{ height: 12, alignSelf: 'stretch', background: 'var(--bg-surface-alt)', borderRadius: 9999, overflow: 'hidden' }}
+							style={{ height: 12, alignSelf: 'stretch', background: 'var(--bg-surface-alt)', borderRadius: 'var(--radius-pill)', overflow: 'hidden' }}
 						>
 							<div
 								className="progress-fill"
@@ -574,7 +572,7 @@ function TakingView({
 									width: `${progressPct}%`,
 									height: '100%',
 									background: 'var(--text-primary)',
-									borderRadius: 9999,
+									borderRadius: 'var(--radius-pill)',
 								}}
 							/>
 						</div>
@@ -605,14 +603,14 @@ function TakingView({
 				style={{
 					width: '100%',
 					background: 'var(--bg-surface)',
-					borderTop: '1px solid var(--border)',
-					padding: '16px 24px',
+					borderTop: '1px solid var(--border-light)',
+					padding: '16px clamp(16px, 4vw, 24px)',
 					display: 'flex',
 					justifyContent: 'center',
 					alignItems: 'center',
 					flexShrink: 0,
 					zIndex: 20,
-					boxShadow: '0 -4px 6px -1px color-mix(in srgb, var(--text-primary) 5%, transparent)',
+					boxShadow: 'var(--shadow-elevated-surface)',
 				}}
 			>
 				<div
@@ -660,13 +658,10 @@ function TakingView({
 function QuestionBlock({ qIndex, question, options, selectedId, isAnswered, onSelect }) {
 	return (
 		<div
+			className="card card-elevated-surface course-quiz-preview-card"
 			style={{
 				width: '100%',
-				padding: 32,
-				background: 'var(--bg-surface)',
-				borderRadius: 16,
-				boxShadow: 'var(--shadow-card)',
-				border: '1px solid var(--border)',
+				padding: 'clamp(20px, 3vw, 28px)',
 				display: 'flex',
 				flexDirection: 'column',
 				gap: 24,
@@ -678,7 +673,7 @@ function QuestionBlock({ qIndex, question, options, selectedId, isAnswered, onSe
 						width: 32,
 						height: 32,
 						background: isAnswered ? 'var(--text-primary)' : 'var(--bg-elevated)',
-						borderRadius: 9999,
+						borderRadius: 'var(--radius-sm)',
 						display: 'flex',
 						justifyContent: 'center',
 						alignItems: 'center',
@@ -734,7 +729,7 @@ function QuestionBlock({ qIndex, question, options, selectedId, isAnswered, onSe
 								justifyContent: 'flex-start',
 								gap: selected ? 14 : 16,
 								padding: selected ? '16px 16px 16px 14px' : 16,
-								borderRadius: 12,
+								borderRadius: 'var(--radius-sm)',
 								border: `1px solid ${selected ? 'var(--text-primary)' : 'var(--border)'}`,
 								background: selected
 									? 'color-mix(in srgb, var(--accent) 5%, var(--bg-surface))'
@@ -751,12 +746,12 @@ function QuestionBlock({ qIndex, question, options, selectedId, isAnswered, onSe
 									style={{
 										width: 24,
 										height: 24,
-										borderRadius: 20,
+										borderRadius: 'var(--radius-2xl)',
 										display: 'flex',
 										alignItems: 'center',
 										justifyContent: 'center',
 										flexShrink: 0,
-										boxShadow: '0 0 0 2px var(--text-primary) inset',
+										boxShadow: 'var(--shadow-focus-ring-inset)',
 									}}
 								>
 									<div
@@ -764,7 +759,7 @@ function QuestionBlock({ qIndex, question, options, selectedId, isAnswered, onSe
 											width: 7.5,
 											height: 7.5,
 											background: 'var(--text-primary)',
-											borderRadius: 9999,
+											borderRadius: 'var(--radius-pill)',
 										}}
 									/>
 								</div>
@@ -773,7 +768,7 @@ function QuestionBlock({ qIndex, question, options, selectedId, isAnswered, onSe
 									style={{
 										width: 20,
 										height: 20,
-										borderRadius: 20,
+										borderRadius: 'var(--radius-2xl)',
 										border: '2px solid var(--border)',
 										flexShrink: 0,
 									}}
@@ -860,14 +855,15 @@ function ResultsView({
 
 	return (
 		<div
+			className="course-quiz-preview-wrap"
 			style={{
 				width: '100%',
 				maxWidth: 960,
 				margin: '0 auto',
-				padding: '32px 24px 48px',
 				display: 'flex',
 				flexDirection: 'column',
 				gap: 24,
+				boxSizing: 'border-box',
 			}}
 		>
 			<nav
@@ -904,23 +900,21 @@ function ResultsView({
 				</p>
 			</header>
 
-			<div
-				className="card"
-				style={{
-					borderRadius: 12,
-					padding: 0,
-					overflow: 'hidden',
-					boxShadow: 'var(--shadow-card)',
-					border: '1px solid var(--border)',
-				}}
-			>
+			<div className="card card-elevated-surface course-quiz-preview-card quiz-results-summary-card">
 				{passed ? (
 					<PassedBanner moduleLabel={moduleLabel} />
 				) : (
 					<FailedBanner />
 				)}
 
-				<div style={{ padding: 32, display: 'flex', flexDirection: 'column', gap: 32 }}>
+				<div
+					style={{
+						padding: 'clamp(20px, 3vw, 32px)',
+						display: 'flex',
+						flexDirection: 'column',
+						gap: 28,
+					}}
+				>
 					<div style={{ display: 'flex', flexDirection: 'column', gap: 16, alignSelf: 'stretch' }}>
 						<div
 							style={{
@@ -980,7 +974,7 @@ function ResultsView({
 								height: 16,
 								alignSelf: 'stretch',
 								background: 'var(--bg-elevated)',
-								borderRadius: 9999,
+								borderRadius: 'var(--radius-pill)',
 								overflow: 'hidden',
 								position: 'relative',
 							}}
@@ -993,7 +987,7 @@ function ResultsView({
 									width: `${Math.min(100, scoreRounded)}%`,
 									height: '100%',
 									background: passed ? 'var(--success)' : 'var(--error)',
-									borderRadius: 9999,
+									borderRadius: 'var(--radius-pill)',
 									zIndex: 0,
 								}}
 							/>
@@ -1021,63 +1015,23 @@ function ResultsView({
 						)}
 					</div>
 
-					<div
-						style={{
-							paddingTop: 16,
-							borderTop: '1px solid var(--border-light)',
-							display: 'inline-flex',
-							alignSelf: 'stretch',
-							justifyContent: 'center',
-							alignItems: 'center',
-							gap: 16,
-							flexWrap: 'wrap',
-						}}
-					>
-						<Link
-							to={`/learn/${courseId}`}
-							style={{
-								display: 'inline-flex',
-								alignItems: 'center',
-								gap: 8,
-								padding: '10px 24px',
-								borderRadius: 8,
-								color: 'var(--text-body)',
-								fontSize: 16,
-								fontWeight: 500,
-								lineHeight: '24px',
-							}}
-						>
-							<ArrowBackIcon size={12} color="var(--text-body)" />
-							Back to Course
+					<div className="quiz-results-actions">
+						<Link to={`/learn/${courseId}`} className="btn-secondary">
+							<ArrowBackIcon size={12} color="currentColor" />
+							Back to course
 						</Link>
 						{passed ? (
 							<>
-								<button
-									type="button"
-									className="btn-secondary"
-									onClick={onGetCertificate}
-									disabled={certLoading}
-									style={{ fontSize: 14, padding: '10px 20px' }}
-								>
+								<button type="button" className="btn-secondary" onClick={onGetCertificate} disabled={certLoading}>
 									{certLoading ? '…' : 'Get Certificate'}
 								</button>
-								<button
-									type="button"
-									className="btn-primary"
-									onClick={onContinue}
-									style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 700, padding: '13px 24px' }}
-								>
+								<button type="button" className="btn-primary" onClick={onContinue}>
 									Continue to Next
 									<ArrowRightIcon size={12} color="var(--bg-surface)" />
 								</button>
 							</>
 						) : (
-							<button
-								type="button"
-								className="btn-primary"
-								onClick={onRetakeInfo}
-								style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 16, fontWeight: 700, padding: '10px 32px' }}
-							>
+							<button type="button" className="btn-primary" onClick={onRetakeInfo}>
 								<RetakeIcon size={12} color="var(--bg-surface)" />
 								Retake Quiz
 							</button>
@@ -1149,32 +1103,9 @@ function ResultsView({
 
 function PassedBanner({ moduleLabel }) {
 	return (
-		<div
-			style={{
-				padding: 24,
-				background: 'color-mix(in srgb, var(--success) 6%, var(--bg-surface))',
-				borderBottom: '1px solid var(--border-light)',
-				display: 'flex',
-				flexDirection: 'column',
-				alignItems: 'center',
-				gap: 12,
-			}}
-		>
-			<div
-				style={{
-					width: 64,
-					height: 64,
-					borderRadius: 9999,
-					background: 'color-mix(in srgb, var(--success) 12%, var(--bg-surface))',
-					display: 'flex',
-					alignItems: 'center',
-					justifyContent: 'center',
-				}}
-			>
-				<PartyIcon size={32} color="var(--success)" />
-			</div>
+		<div className="quiz-results-banner">
 			<div style={{ textAlign: 'center', maxWidth: 448 }}>
-				<div style={{ color: 'var(--text-primary)', fontSize: 20, fontWeight: 700, lineHeight: '28px', marginBottom: 4 }}>You Passed!</div>
+				<div style={{ color: 'var(--text-primary)', fontSize: 20, fontWeight: 700, lineHeight: '28px', marginBottom: 4 }}>You passed!</div>
 				<div style={{ color: 'var(--text-muted)', fontSize: 16, lineHeight: '24px' }}>
 					Great job! You’ve mastered the basics of {moduleLabel}.
 				</div>
@@ -1185,32 +1116,9 @@ function PassedBanner({ moduleLabel }) {
 
 function FailedBanner() {
 	return (
-		<div
-			style={{
-				padding: 24,
-				background: 'color-mix(in srgb, var(--error) 8%, var(--bg-surface))',
-				borderBottom: '1px solid var(--border-light)',
-				display: 'flex',
-				flexDirection: 'column',
-				alignItems: 'center',
-				gap: 12,
-			}}
-		>
-			<div
-				style={{
-					width: 64,
-					height: 64,
-					borderRadius: 9999,
-					background: 'color-mix(in srgb, var(--error) 10%, var(--bg-surface))',
-					display: 'flex',
-					alignItems: 'center',
-					justifyContent: 'center',
-				}}
-			>
-				<FailXIcon size={24} color="var(--error)" />
-			</div>
+		<div className="quiz-results-banner">
 			<div style={{ textAlign: 'center', maxWidth: 448 }}>
-				<div style={{ color: 'var(--text-primary)', fontSize: 20, fontWeight: 700, lineHeight: '28px', marginBottom: 4 }}>You Did Not Pass</div>
+				<div style={{ color: 'var(--text-primary)', fontSize: 20, fontWeight: 700, lineHeight: '28px', marginBottom: 4 }}>You did not pass</div>
 				<div style={{ color: 'var(--text-secondary)', fontSize: 14, lineHeight: '20px' }}>
 					Don’t worry, mastering new concepts takes time. Review your
 					<br />
@@ -1228,11 +1136,8 @@ function QuestionResultCard({ index, question, row }) {
 
 	return (
 		<div
+			className="card card-elevated-surface course-quiz-preview-card quiz-results-question-card"
 			style={{
-				padding: 24,
-				background: 'var(--bg-surface)',
-				borderRadius: 8,
-				border: '1px solid var(--border)',
 				display: 'inline-flex',
 				alignSelf: 'stretch',
 				gap: 16,
@@ -1268,7 +1173,7 @@ function QuestionResultCard({ index, question, row }) {
 						style={{
 							padding: 12,
 							background: 'var(--bg-surface-alt)',
-							borderRadius: 4,
+							borderRadius: 'var(--radius-sm)',
 						}}
 					>
 						<div style={{ color: 'var(--text-secondary)', fontSize: 12, lineHeight: '20px' }}>
@@ -1298,7 +1203,7 @@ function AnswerRowCorrect({ text }) {
 			style={{
 				padding: 12,
 				background: 'color-mix(in srgb, var(--success) 6%, var(--bg-surface))',
-				borderRadius: 4,
+				borderRadius: 'var(--radius-sm)',
 				border: '1px solid color-mix(in srgb, var(--success) 40%, var(--border))',
 				display: 'inline-flex',
 				alignSelf: 'stretch',
@@ -1311,7 +1216,7 @@ function AnswerRowCorrect({ text }) {
 					style={{
 						width: 16,
 						height: 16,
-						borderRadius: 9999,
+						borderRadius: 'var(--radius-pill)',
 						background: 'var(--success)',
 						display: 'flex',
 						alignItems: 'center',
@@ -1333,7 +1238,7 @@ function AnswerRowWrong({ text }) {
 			style={{
 				padding: 12,
 				background: 'color-mix(in srgb, var(--error) 5%, var(--bg-surface))',
-				borderRadius: 4,
+				borderRadius: 'var(--radius-sm)',
 				border: '1px solid color-mix(in srgb, var(--error) 28%, var(--border))',
 				display: 'inline-flex',
 				alignSelf: 'stretch',
@@ -1346,7 +1251,7 @@ function AnswerRowWrong({ text }) {
 					style={{
 						width: 16,
 						height: 16,
-						borderRadius: 9999,
+						borderRadius: 'var(--radius-pill)',
 						background: 'color-mix(in srgb, var(--error) 50%, var(--bg-surface))',
 						border: '1px solid color-mix(in srgb, var(--error) 50%, var(--bg-surface))',
 						display: 'flex',
@@ -1358,7 +1263,7 @@ function AnswerRowWrong({ text }) {
 						style={{
 							width: 6,
 							height: 6,
-							borderRadius: 9999,
+							borderRadius: 'var(--radius-pill)',
 							background: 'var(--bg-surface)',
 						}}
 					/>
@@ -1376,7 +1281,7 @@ function AnswerRowCorrectLabel({ text, wrongRadio }) {
 			style={{
 				padding: 12,
 				background: 'color-mix(in srgb, var(--success) 6%, var(--bg-surface))',
-				borderRadius: 4,
+				borderRadius: 'var(--radius-sm)',
 				border: '1px solid color-mix(in srgb, var(--success) 40%, var(--border))',
 				display: 'inline-flex',
 				alignSelf: 'stretch',
@@ -1390,7 +1295,7 @@ function AnswerRowCorrectLabel({ text, wrongRadio }) {
 						style={{
 							width: 16,
 							height: 16,
-							borderRadius: 9999,
+							borderRadius: 'var(--radius-pill)',
 							border: '1px solid var(--success)',
 						}}
 					/>
@@ -1399,7 +1304,7 @@ function AnswerRowCorrectLabel({ text, wrongRadio }) {
 						style={{
 							width: 16,
 							height: 16,
-							borderRadius: 9999,
+							borderRadius: 'var(--radius-pill)',
 							background: 'var(--success)',
 						}}
 					/>
@@ -1415,19 +1320,8 @@ function Swatch({ color }) {
 	return (
 		<div
 			aria-hidden
-			style={{ width: 15, height: 15, borderRadius: 2, background: color }}
+			style={{ width: 15, height: 15, borderRadius: 'var(--radius-xs)', background: color }}
 		/>
-	);
-}
-
-function PartyIcon({ size, color }) {
-	return (
-		<svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-			<path
-				d="M12 2L14.1 8.1L20.5 8.9L15.5 12.4L16.4 19L12 16.1L7.6 19L8.5 12.4L3.5 8.9L9.9 8.1L12 2Z"
-				fill={color}
-			/>
-		</svg>
 	);
 }
 
@@ -1435,15 +1329,6 @@ function MiniCheckIcon() {
 	return (
 		<svg width="8" height="8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
 			<path d="M20 6L9 17L4 12" stroke="var(--bg-surface)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-		</svg>
-	);
-}
-
-function FailXIcon({ size, color }) {
-	return (
-		<svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-			<circle cx="12" cy="12" r="10" fill={color} />
-			<path d="M8 8L16 16M16 8L8 16" stroke="var(--bg-surface)" strokeWidth="2" strokeLinecap="round" />
 		</svg>
 	);
 }
@@ -1517,87 +1402,63 @@ function ChevronIcon({ down, size, color }) {
 }
 
 function SubmitModal({ answeredCount, totalQuestions, onBack, onConfirm, isSubmitting }) {
-	return (
+	return createPortal(
 		<div
 			role="dialog"
 			aria-modal
 			aria-labelledby="submit-quiz-title"
+			className="quiz-submit-modal-backdrop"
 			onClick={onBack}
-			style={{
-				position: 'fixed',
-				inset: 0,
-				zIndex: 300,
-				background: 'color-mix(in srgb, var(--text-primary) 30%, var(--bg-surface))',
-				display: 'flex',
-				alignItems: 'center',
-				justifyContent: 'center',
-				padding: 24,
-			}}
 		>
 			<div
 				role="presentation"
 				onClick={(e) => e.stopPropagation()}
-				className="card"
-				style={{
-					borderRadius: 24,
-					maxWidth: 440,
-					width: '100%',
-					padding: 40,
-					textAlign: 'center',
-					boxShadow: 'var(--shadow-elevated)',
-					border: '1px solid var(--border)',
-				}}
+				className="card card-elevated-surface course-quiz-preview-card quiz-submit-modal-card"
 			>
-				<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24 }}>
-					<ModalWarningIcon />
-					<div>
-						<div id="submit-quiz-title" style={{ color: 'var(--text-primary)', fontSize: 24, fontWeight: 800, marginBottom: 12 }}>
-							Submit Quiz?
+				<div className="quiz-submit-modal__accent" aria-hidden />
+				<div className="quiz-submit-modal__body">
+					<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
+						<ModalWarningIcon />
+						<div>
+							<div id="submit-quiz-title" style={{ color: 'var(--text-primary)', fontSize: 22, fontWeight: 800, marginBottom: 12 }}>
+								Submit quiz?
+							</div>
+							<div style={{ color: 'var(--text-secondary)', fontSize: 15, lineHeight: 1.55 }}>
+								You have answered{' '}
+								<strong style={{ color: 'var(--text-primary)' }}>
+									{answeredCount} of {totalQuestions}
+								</strong>{' '}
+								{totalQuestions === 1 ? 'question' : 'questions'}.
+								<br />
+								Once submitted, you cannot change your answers.
+							</div>
 						</div>
-						<div style={{ color: 'var(--text-secondary)', fontSize: 16, lineHeight: 1.5 }}>
-							You have answered{' '}
-							<strong style={{ color: 'var(--text-primary)' }}>
-								{answeredCount} of {totalQuestions}
-							</strong>{' '}
-							{totalQuestions === 1 ? 'question' : 'questions'}.
-							<br />
-							Once submitted, you cannot change your answers.
+						<div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+							<button type="button" className="btn-secondary" onClick={onBack} style={{ minWidth: 120 }}>
+								Go back
+							</button>
+							<button
+								type="button"
+								className="btn-primary"
+								onClick={onConfirm}
+								disabled={isSubmitting}
+								style={{ minWidth: 160 }}
+							>
+								{isSubmitting ? '…' : 'Confirm submit'}
+							</button>
 						</div>
-					</div>
-					<div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-						<button type="button" className="btn-secondary" onClick={onBack} style={{ minWidth: 120 }}>
-							Go Back
-						</button>
-						<button
-							type="button"
-							className="btn-primary"
-							onClick={onConfirm}
-							disabled={isSubmitting}
-							style={{ minWidth: 160 }}
-						>
-							{isSubmitting ? '…' : 'Confirm Submit'}
-						</button>
 					</div>
 				</div>
 			</div>
-		</div>
+		</div>,
+		document.body
 	);
 }
 
 function ModalWarningIcon() {
 	return (
-		<div
-			style={{
-				width: 72,
-				height: 72,
-				borderRadius: 9999,
-				display: 'flex',
-				alignItems: 'center',
-				justifyContent: 'center',
-				background: 'color-mix(in srgb, var(--accent) 12%, var(--bg-surface))',
-			}}
-		>
-			<svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+		<div className="dashboard-stat-icon quiz-submit-modal-warn-icon">
+			<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
 				<path
 					d="M12 3L1 20h22L12 3z"
 					stroke="var(--accent)"

@@ -49,7 +49,7 @@ const Login = () => {
 
 	return (
 		<main
-			className="page-fade"
+			className="page-fade auth-page"
 			style={{
 				minHeight: 'calc(100vh - 64px)',
 				width: '100%',
@@ -66,23 +66,15 @@ const Login = () => {
 					width: '100%',
 					maxWidth: '420px',
 					padding: '28px',
-					borderRadius: '12px',
+					borderRadius: 'var(--radius-lg)',
 					display: 'flex',
 					flexDirection: 'column',
 					gap: '20px',
 				}}
 			>
 				<header style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-					<div
-						style={{
-							fontFamily: 'var(--font)',
-							fontWeight: 700,
-							fontSize: '24px',
-							lineHeight: '32px',
-							color: 'var(--text-primary)',
-						}}
-					>
-						Coursly
+					<div className="auth-page-brand">
+						Coursly<span className="navbar-logo__period" aria-hidden="true">.</span>
 					</div>
 					<h1
 						style={{
@@ -179,7 +171,7 @@ const Login = () => {
 					}}
 				>
 					Don&apos;t have an account?{' '}
-					<Link to="/register" style={{ color: 'var(--accent)', fontWeight: 600 }}>
+					<Link to="/register" className="auth-form-cross-link">
 						Register
 					</Link>
 				</p>

@@ -68,7 +68,7 @@ const CourseCatalog = () => {
 
 	return (
 		<main
-			className="page-fade"
+			className="page-fade course-catalog"
 			style={{
 				width: '100%',
 				maxWidth: 1280,
@@ -89,7 +89,7 @@ const CourseCatalog = () => {
 			</header>
 
 			<div
-				className="card"
+				className="course-catalog__filters"
 				style={{
 					padding: 20,
 					marginBottom: 24,
@@ -165,14 +165,7 @@ const CourseCatalog = () => {
 					<p>No published courses match your filters.</p>
 				</div>
 			) : (
-				<div
-					style={{
-						display: 'flex',
-						flexWrap: 'wrap',
-						gap: 24,
-						justifyContent: 'flex-start',
-					}}
-				>
+				<div className="course-catalog__grid">
 					{courses.map((course) => (
 						<CourseCard key={course.id} course={course} showProgress={false} />
 					))}

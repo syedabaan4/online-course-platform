@@ -1,4 +1,5 @@
 import Swal from 'sweetalert2';
+import { confirmAction as confirmActionImpl } from './confirmRegistry';
 
 const toast = Swal.mixin({
   toast: true,
@@ -6,8 +7,8 @@ const toast = Swal.mixin({
   showConfirmButton: false,
   timer: 3000,
   timerProgressBar: true,
-  background: '#FFFFFF',
-  color: '#0F172A',
+  background: 'var(--bg-surface)',
+  color: 'var(--text-primary)',
 });
 
 export function showSuccess(message) {
@@ -18,18 +19,8 @@ export function showError(message) {
   toast.fire({ icon: 'error', title: message || 'Something went wrong' });
 }
 
-export async function confirmAction(title, text) {
-  const result = await Swal.fire({
-    title, text,
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#256AF4',
-    cancelButtonColor: '#EF4444',
-    confirmButtonText: 'Yes, do it',
-    background: '#FFFFFF',
-    color: '#0F172A',
-  });
-  return result.isConfirmed;
+export function confirmAction(title, text, options = {}) {
+  return confirmActionImpl(title, text, options);
 }
 
 export default toast;

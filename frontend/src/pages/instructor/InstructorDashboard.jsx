@@ -223,13 +223,9 @@ const InstructorDashboard = () => {
 					</section>
 
 					<section style={{ alignSelf: 'stretch', display: 'inline-flex', gap: '24px', alignItems: 'stretch' }}>
-						<article className="card" style={{ width: '100%', borderRadius: '12px', padding: '24px' }}>
+						<article className="card card-elevated-surface instructor-dashboard-stat-card">
 							<div style={{ display: 'inline-flex', alignItems: 'center', gap: '16px' }}>
-								<div
-									className="dashboard-stat-icon"
-									style={{ background: 'var(--accent-bg)', color: 'var(--accent)' }}
-									aria-hidden
-								>
+								<div className="dashboard-stat-icon" aria-hidden>
 									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
 										<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
 										<path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2Z" />
@@ -263,13 +259,9 @@ const InstructorDashboard = () => {
 							</div>
 						</article>
 
-						<article className="card" style={{ width: '100%', borderRadius: '12px', padding: '24px' }}>
+						<article className="card card-elevated-surface instructor-dashboard-stat-card">
 							<div style={{ display: 'inline-flex', alignItems: 'center', gap: '16px' }}>
-								<div
-									className="dashboard-stat-icon"
-									style={{ background: 'color-mix(in srgb, var(--success) 12%, var(--bg-surface))', color: 'var(--success)' }}
-									aria-hidden
-								>
+								<div className="dashboard-stat-icon" aria-hidden>
 									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
 										<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
 										<polyline points="22 4 12 14.01 9 11.01" />
@@ -302,13 +294,9 @@ const InstructorDashboard = () => {
 							</div>
 						</article>
 
-						<article className="card" style={{ width: '100%', borderRadius: '12px', padding: '24px' }}>
+						<article className="card card-elevated-surface instructor-dashboard-stat-card">
 							<div style={{ display: 'inline-flex', alignItems: 'center', gap: '16px' }}>
-								<div
-									className="dashboard-stat-icon"
-									style={{ background: 'var(--bg-elevated)', color: 'var(--text-muted)' }}
-									aria-hidden
-								>
+								<div className="dashboard-stat-icon" aria-hidden>
 									<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
 										<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
 										<polyline points="14 2 14 8 20 8" />
@@ -345,16 +333,7 @@ const InstructorDashboard = () => {
 						</article>
 					</section>
 
-					<section
-						className="card"
-						style={{
-							alignSelf: 'stretch',
-							padding: 0,
-							borderRadius: '12px',
-							overflow: 'hidden',
-							border: '1px solid var(--border)',
-						}}
-					>
+					<section className="card card-elevated-surface instructor-dashboard-courses-card">
 						<div
 							style={{
 								paddingLeft: '24px',
@@ -434,14 +413,14 @@ const InstructorDashboard = () => {
 														<img
 															src={course.thumbnailUrl}
 															alt={course.title}
-															style={{ width: '48px', height: '48px', borderRadius: '8px', objectFit: 'cover', background: 'var(--bg-elevated)' }}
+															style={{ width: '48px', height: '48px', borderRadius: 'var(--radius)', objectFit: 'cover', background: 'var(--bg-elevated)' }}
 														/>
 													) : (
 														<div
 															style={{
 																width: '48px',
 																height: '48px',
-																borderRadius: '8px',
+																borderRadius: 'var(--radius)',
 																background: 'var(--bg-elevated)',
 																display: 'flex',
 																alignItems: 'center',

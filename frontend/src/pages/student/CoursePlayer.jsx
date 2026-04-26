@@ -12,7 +12,6 @@ import { getMyAttempts } from '../../api/quiz.api';
 import { checkCompletion } from '../../api/certificate.api';
 import { showError, showSuccess } from '../../components/Toast';
 import LoadingSpinner from '../../components/LoadingSpinner';
-import { useAuth } from '../../context/AuthContext';
 
 const normalizePayload = (payload) => payload?.data ?? payload;
 
@@ -99,7 +98,6 @@ function getResourceLabel(fileUrl) {
 const CoursePlayer = () => {
 	const { courseId: courseIdParam } = useParams();
 	const navigate = useNavigate();
-	const { user } = useAuth();
 	const courseId = parseInt(courseIdParam, 10);
 
 	const [course, setCourse] = useState(null);
@@ -390,28 +388,8 @@ const CoursePlayer = () => {
 		}
 	};
 
-	const handleSaveLecture = () => {
-		if (!activeLectureId || !courseId) {
-			return;
-		}
-		const key = `savedLecturesMap`;
-		try {
-			const raw = localStorage.getItem(key);
-			const o = raw ? JSON.parse(raw) : {};
-			const set = new Set(o[courseId] || []);
-			set.add(activeLectureId);
-			localStorage.setItem(key, JSON.stringify({ ...o, [courseId]: [...set] }));
-			showSuccess('Lecture saved for later.');
-		} catch {
-			localStorage.setItem(key, JSON.stringify({ [courseId]: [activeLectureId] }));
-			showSuccess('Lecture saved for later.');
-		}
-	};
-
 	const videoEmbed = activeLecture?.videoUrl ? toYouTubeEmbedUrl(activeLecture.videoUrl) : '';
 	const showYt = Boolean(activeLecture?.videoUrl && isYouTubeUrl(activeLecture.videoUrl) && videoEmbed);
-
-	const userInitial = (user?.name || 'U').trim().charAt(0).toUpperCase() || 'U';
 
 	if (isLoading) {
 		return <LoadingSpinner fullPage />;
@@ -468,49 +446,29 @@ const CoursePlayer = () => {
 					</svg>
 					<span style={{ color: 'var(--text-primary)', fontSize: 14, fontWeight: 600, lineHeight: '20px', letterSpacing: '0.35px' }}>Back to Dashboard</span>
 				</Link>
-				<div style={{ display: 'flex', alignItems: 'center', gap: 16, minWidth: 0 }}>
-					<div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-						<div
-							title={course.title}
-							style={{
-								color: 'var(--text-secondary)',
-								fontSize: 14,
-								fontWeight: 500,
-								lineHeight: '20px',
-								overflow: 'hidden',
-								textOverflow: 'ellipsis',
-								whiteSpace: 'nowrap',
-								maxWidth: 220,
-							}}
-						>
-							{courseTitleShort || 'Course'}
-						</div>
-						<div style={{ width: 1, height: 16, background: 'var(--text-dim)', flexShrink: 0 }} />
-						<div style={{ color: 'var(--text-primary)', fontSize: 14, fontWeight: 700, lineHeight: '20px', whiteSpace: 'nowrap' }}>
-							{activeModule
-								? activeQuizId
-									? `Module ${activeModuleIndex + 1} Quiz`
-									: `Module ${activeModuleIndex + 1}`
-								: '—'}
-						</div>
-					</div>
+				<div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
 					<div
+						title={course.title}
 						style={{
-							padding: 8,
-							background: 'var(--bg-elevated)',
-							borderRadius: 9999,
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'center',
-							width: 36,
-							height: 36,
 							color: 'var(--text-secondary)',
 							fontSize: 14,
-							fontWeight: 600,
+							fontWeight: 500,
+							lineHeight: '20px',
+							overflow: 'hidden',
+							textOverflow: 'ellipsis',
+							whiteSpace: 'nowrap',
+							maxWidth: 220,
 						}}
-						aria-hidden
 					>
-						{userInitial}
+						{courseTitleShort || 'Course'}
+					</div>
+					<div style={{ width: 1, height: 16, background: 'var(--text-dim)', flexShrink: 0 }} />
+					<div style={{ color: 'var(--text-primary)', fontSize: 14, fontWeight: 700, lineHeight: '20px', whiteSpace: 'nowrap' }}>
+						{activeModule
+							? activeQuizId
+								? `Module ${activeModuleIndex + 1} Quiz`
+								: `Module ${activeModuleIndex + 1}`
+							: '—'}
 					</div>
 				</div>
 			</header>
@@ -544,8 +502,16 @@ const CoursePlayer = () => {
 						>
 							{course.title}
 						</div>
-						<div className="progress-bar" style={{ width: '100%', height: 8, background: 'var(--border)', borderRadius: 9999, marginTop: 4 }}>
-							<div className="progress-fill" style={{ width: `${pct}%`, height: '100%', borderRadius: 9999 }} />
+						<div className="progress-bar" style={{ width: '100%', height: 8, background: 'var(--border)', borderRadius: 'var(--radius-pill)', marginTop: 4 }}>
+							<div
+								className="progress-fill"
+								style={{
+									width: `${pct}%`,
+									height: '100%',
+									borderRadius: 'var(--radius-pill)',
+									background: 'var(--text-primary)',
+								}}
+							/>
 						</div>
 						<div style={{ color: 'var(--text-muted)', fontSize: 12, lineHeight: '16px', marginTop: 2 }}>
 							{completedN} of {totalLectures} lectures complete
@@ -573,6 +539,9 @@ const CoursePlayer = () => {
 						{sortedModules.map((module, modIdx) => {
 							const isOpen = expandedModuleIds.has(module.id);
 							const lecs = [...(module.lectures || [])].sort((a, b) => (a.order || 0) - (b.order || 0));
+							const publishedQuiz = module.quiz?.isPublished ? module.quiz : null;
+							const quizPassedState = publishedQuiz ? Boolean(quizPassed[publishedQuiz.id]) : false;
+							const quizIsActive = Boolean(publishedQuiz && activeQuizId === publishedQuiz.id);
 							return (
 								<div key={module.id} style={{ borderBottom: '1px solid var(--border-light)' }}>
 									<button
@@ -621,8 +590,10 @@ const CoursePlayer = () => {
 														style={{
 															width: '100%',
 															border: 'none',
-															background: isActive ? 'var(--accent-bg)' : 'transparent',
-															borderRight: isActive ? '4px solid var(--accent)' : '4px solid transparent',
+															background: isActive
+																? 'color-mix(in srgb, var(--text-primary) 6%, var(--bg-surface))'
+																: 'transparent',
+															borderRight: isActive ? '4px solid var(--text-primary)' : '4px solid transparent',
 															padding: '12px 20px',
 															display: 'flex',
 															alignItems: 'flex-start',
@@ -637,14 +608,15 @@ const CoursePlayer = () => {
 																	style={{
 																		width: 20,
 																		height: 20,
-																		borderRadius: 9999,
-																		background: 'color-mix(in srgb, var(--success) 16%, var(--bg-surface))',
+																		borderRadius: '50%',
+																		background: 'var(--text-primary)',
 																		display: 'flex',
 																		alignItems: 'center',
 																		justifyContent: 'center',
 																	}}
+																	aria-hidden
 																>
-																	<svg width="12" height="10" viewBox="0 0 12 10" style={{ color: 'var(--success)' }}>
+																	<svg width="12" height="10" viewBox="0 0 12 10" style={{ color: 'var(--bg-surface)' }}>
 																		<path
 																			fill="currentColor"
 																			d="M1.5 5.2l2.3 2.1L10.1 0.5 11.5 2 3.5 9.2 0 5.2l1.5-1.2z"
@@ -652,23 +624,27 @@ const CoursePlayer = () => {
 																	</svg>
 																</div>
 															) : isActive ? (
-																<div
-																	style={{
-																		width: 20,
-																		height: 20,
-																		borderRadius: 9999,
-																		background: 'var(--text-primary)',
-																		display: 'flex',
-																		alignItems: 'center',
-																		justifyContent: 'center',
-																	}}
-																>
-																	<svg width="7" height="9" viewBox="0 0 7 9" style={{ color: 'var(--bg-surface)' }}>
-																		<path fill="currentColor" d="M0 0v9l7-4.5L0 0z" />
-																	</svg>
-																</div>
+																	<div
+																		style={{
+																			width: 20,
+																			height: 20,
+																			borderRadius: '50%',
+																			background: 'var(--text-primary)',
+																			display: 'flex',
+																			alignItems: 'center',
+																			justifyContent: 'center',
+																		}}
+																		aria-hidden
+																	>
+																		<svg width="7" height="9" viewBox="0 0 7 9" style={{ color: 'var(--bg-surface)' }}>
+																			<path fill="currentColor" d="M0 0v9l7-4.5L0 0z" />
+																		</svg>
+																	</div>
 															) : (
-																<div style={{ width: 20, height: 20, borderRadius: 9999, border: '1px solid var(--text-dim)' }} />
+																<div
+																	style={{ width: 20, height: 20, borderRadius: '50%', border: '1px solid var(--text-dim)' }}
+																	aria-hidden
+																/>
 															)}
 														</div>
 														<div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
@@ -687,55 +663,87 @@ const CoursePlayer = () => {
 													</button>
 												);
 											})}
-											{module.quiz && module.quiz.isPublished ? (
+											{publishedQuiz ? (
 												<button
 													type="button"
 													onClick={() => {
-														setActiveQuizId(module.quiz.id);
+														setActiveQuizId(publishedQuiz.id);
 														setActiveLectureId(null);
 														setMarkError('');
 													}}
 													style={{
 														width: '100%',
 														display: 'flex',
-														alignItems: 'center',
-														gap: 8,
-														padding: '10px 20px 14px',
-														fontSize: 14,
-														fontWeight: 600,
-														color: 'var(--accent)',
-														background:
-															activeQuizId === module.quiz.id ? 'var(--accent-bg)' : 'transparent',
+														alignItems: 'flex-start',
+														gap: 12,
+														padding: '12px 20px',
 														border: 'none',
-														borderRight:
-															activeQuizId === module.quiz.id ? '4px solid var(--accent)' : '4px solid transparent',
+														background: quizIsActive
+															? 'color-mix(in srgb, var(--text-primary) 6%, var(--bg-surface))'
+															: 'transparent',
+														borderRight: quizIsActive ? '4px solid var(--text-primary)' : '4px solid transparent',
 														cursor: 'pointer',
 														textAlign: 'left',
 													}}
 												>
-													<span style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{module.quiz.title}</span>
-													{quizPassed[module.quiz.id] ? (
-														<span className="badge badge-beginner" style={{ textTransform: 'none', fontSize: 11 }}>
-															Passed
-														</span>
-													) : null}
-													{activeQuizId === module.quiz.id ? (
-														<span
+													<div style={{ width: 20, height: 22, paddingTop: 2, flexShrink: 0 }}>
+														{quizPassedState ? (
+															<div
+																style={{
+																	width: 20,
+																	height: 20,
+																	borderRadius: '50%',
+																	background: 'var(--text-primary)',
+																	display: 'flex',
+																	alignItems: 'center',
+																	justifyContent: 'center',
+																}}
+																aria-hidden
+															>
+																<svg width="12" height="10" viewBox="0 0 12 10" style={{ color: 'var(--bg-surface)' }}>
+																	<path
+																		fill="currentColor"
+																		d="M1.5 5.2l2.3 2.1L10.1 0.5 11.5 2 3.5 9.2 0 5.2l1.5-1.2z"
+																	/>
+																</svg>
+															</div>
+														) : quizIsActive ? (
+															<div
+																style={{
+																	width: 20,
+																	height: 20,
+																	borderRadius: '50%',
+																	background: 'var(--text-primary)',
+																	display: 'flex',
+																	alignItems: 'center',
+																	justifyContent: 'center',
+																}}
+																aria-hidden
+															>
+																<svg width="7" height="9" viewBox="0 0 7 9" style={{ color: 'var(--bg-surface)' }}>
+																	<path fill="currentColor" d="M0 0v9l7-4.5L0 0z" />
+																</svg>
+															</div>
+														) : (
+															<div
+																style={{ width: 20, height: 20, borderRadius: '50%', border: '1px solid var(--text-dim)' }}
+																aria-hidden
+															/>
+														)}
+													</div>
+													<div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, flex: 1 }}>
+														<div
 															style={{
-																marginLeft: 'auto',
-																fontSize: 10,
-																fontWeight: 700,
-																textTransform: 'uppercase',
-																letterSpacing: '0.4px',
-																color: 'var(--accent)',
-																background: 'var(--bg-surface)',
-																padding: '4px 8px',
-																borderRadius: 6,
+																color: quizIsActive ? 'var(--text-primary)' : 'var(--text-secondary)',
+																fontSize: 14,
+																fontWeight: quizIsActive ? 700 : 500,
+																lineHeight: '20px',
+																wordBreak: 'break-word',
 															}}
 														>
-															Active
-														</span>
-													) : null}
+															{publishedQuiz.title}
+														</div>
+													</div>
 												</button>
 											) : null}
 										</div>
@@ -808,12 +816,13 @@ const CoursePlayer = () => {
 									style={{
 										display: 'block',
 										padding: 16,
-										borderRadius: 8,
-										background: 'var(--accent-bg)',
-										color: 'var(--accent)',
+										borderRadius: 'var(--radius)',
+										background: 'color-mix(in srgb, var(--success) 10%, var(--bg-surface))',
+										color: 'var(--text-primary)',
 										fontWeight: 600,
 										textAlign: 'center',
 										textDecoration: 'none',
+										border: '1px solid color-mix(in srgb, var(--success) 22%, var(--border))',
 									}}
 								>
 									Course complete! View celebration and get your certificate →
@@ -822,7 +831,7 @@ const CoursePlayer = () => {
 								<div
 									style={{
 										padding: 16,
-										borderRadius: 8,
+										borderRadius: 'var(--radius)',
 										background: 'var(--bg-elevated)',
 										color: 'var(--text-secondary)',
 										fontWeight: 500,
@@ -833,20 +842,12 @@ const CoursePlayer = () => {
 									All lectures complete. Pass all published module quizzes to finish the course and unlock your certificate.
 								</div>
 							) : null}
-							<div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-								<div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16 }}>
-									<div style={{ color: 'var(--text-primary)', fontSize: 24, fontWeight: 700, lineHeight: '32px' }}>{activeLecture.title}</div>
-									<div style={{ color: 'var(--text-muted)', fontSize: 14, fontWeight: 500, lineHeight: '20px', whiteSpace: 'nowrap' }}>{Math.round(pct)}% Complete</div>
-								</div>
-								<div className="progress-bar" style={{ width: '100%', height: 8, background: 'var(--border)', borderRadius: 9999 }}>
-									<div className="progress-fill" style={{ width: `${pct}%`, height: '100%', borderRadius: 9999 }} />
-								</div>
-							</div>
+							<div style={{ color: 'var(--text-primary)', fontSize: 24, fontWeight: 700, lineHeight: '32px' }}>{activeLecture.title}</div>
 
 							<div
 								style={{
 									width: '100%',
-									borderRadius: 12,
+									borderRadius: 'var(--radius-lg)',
 									overflow: 'hidden',
 									background: 'var(--text-primary)',
 									boxShadow: 'var(--shadow-elevated)',
@@ -908,15 +909,6 @@ const CoursePlayer = () => {
 									{markError ? <div style={{ color: 'var(--error)', fontSize: 14, marginTop: 4 }}>{markError}</div> : null}
 								</div>
 								<div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, alignItems: 'flex-start' }}>
-									<button type="button" className="btn-secondary btn-sm" onClick={handleSaveLecture} style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-body)' }}>
-										<svg width="12" height="12" viewBox="0 0 12 12" style={{ color: 'var(--text-body)' }}>
-											<path
-												fill="currentColor"
-												d="M2 0h5l3 3v7a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2zm0 2v8h8V4H6V2H2zm2 6h4v1H4V8zm0-2h4v1H4V6z"
-											/>
-										</svg>
-										Save
-									</button>
 									<button
 										type="button"
 										className="btn-primary btn-sm"
@@ -956,7 +948,7 @@ const CoursePlayer = () => {
 														style={{
 															width: 40,
 															height: 40,
-															borderRadius: 8,
+															borderRadius: 'var(--radius)',
 															background: external ? 'var(--accent-bg)' : 'var(--bg-elevated)',
 															display: 'flex',
 															alignItems: 'center',
@@ -1018,17 +1010,17 @@ function CourseQuizPreview({ courseId, moduleIndex, quiz, attempts, moduleDescri
 	const sortedQuestions = [...(quiz.questions || [])].sort((a, b) => a.id - b.id);
 	const n = sortedQuestions.length;
 	const best = attempts.length ? Math.max(...attempts.map((a) => Number(a.score) || 0)) : null;
-	const bestLabel = best == null ? 'Not attempted' : `${Math.round(best * 10) / 10}%`;
+	const bestLabel = best == null ? 'NA' : `${Math.round(best * 10) / 10}%`;
 	const description =
 		(moduleDescription && String(moduleDescription).trim()) ||
 		'Test your knowledge of the material in this module. Read each question carefully and select the best answer.';
 
 	return (
 		<div
+			className="course-quiz-preview-wrap"
 			style={{
 				width: '100%',
 				maxWidth: 1024,
-				padding: '32px 32px 64px',
 				margin: '0 auto',
 				boxSizing: 'border-box',
 			}}
@@ -1045,43 +1037,30 @@ function CourseQuizPreview({ courseId, moduleIndex, quiz, attempts, moduleDescri
 			<h1 style={{ color: 'var(--text-primary)', fontSize: 32, fontWeight: 800, lineHeight: 1.2, margin: '0 0 12px' }}>{quiz.title}</h1>
 			<p style={{ color: 'var(--text-secondary)', fontSize: 16, lineHeight: 1.6, margin: '0 0 32px', maxWidth: 720 }}>{description}</p>
 
-			<div
-				style={{
-					display: 'grid',
-					gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-					gap: 16,
-					marginBottom: 32,
-				}}
-			>
+			<div className="course-quiz-preview-stats">
 				<PreviewStatCard
-					tint="var(--accent-bg)"
-					iconColor="var(--accent)"
 					label="Questions"
 					value={String(n)}
 					icon={
-						<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden>
+						<svg viewBox="0 0 24 24" aria-hidden>
 							<path fill="currentColor" d="M4 6h2v12H4V6zm4 0h2v7H8V6zm4 0h2v10h-2V6zm4 0h2v4h-2V6z" />
 						</svg>
 					}
 				/>
 				<PreviewStatCard
-					tint="color-mix(in srgb, var(--success) 15%, var(--bg-surface))"
-					iconColor="var(--success)"
 					label="Passing score"
 					value={`${quiz.passingScore}%`}
 					icon={
-						<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden>
+						<svg viewBox="0 0 24 24" aria-hidden>
 							<path fill="currentColor" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" />
 						</svg>
 					}
 				/>
 				<PreviewStatCard
-					tint="var(--bg-elevated)"
-					iconColor="var(--text-secondary)"
 					label="Attempts"
 					value="Unlimited"
 					icon={
-						<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden>
+						<svg viewBox="0 0 24 24" aria-hidden>
 							<path
 								fill="currentColor"
 								d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"
@@ -1090,13 +1069,11 @@ function CourseQuizPreview({ courseId, moduleIndex, quiz, attempts, moduleDescri
 					}
 				/>
 				<PreviewStatCard
-					tint="var(--bg-elevated)"
-					iconColor="var(--text-body)"
 					label="Best score"
 					value={bestLabel}
 					valueMuted={!attempts.length}
 					icon={
-						<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden>
+						<svg viewBox="0 0 24 24" aria-hidden>
 							<path fill="currentColor" d="M5 16L3 5l5.5 3L12 3l3.5 2L21 3l-2 11H5zm0 0v2h14v-2H5z" />
 						</svg>
 					}
@@ -1104,38 +1081,14 @@ function CourseQuizPreview({ courseId, moduleIndex, quiz, attempts, moduleDescri
 			</div>
 
 			<div
-				className="card"
+				className="card course-quiz-preview-card"
 				style={{
 					textAlign: 'center',
-					padding: '40px 32px 32px',
+					padding: '28px 24px 28px',
 					maxWidth: 560,
 					margin: '0 auto',
-					boxShadow: 'var(--shadow-card)',
 				}}
 			>
-				<div
-					style={{
-						width: 72,
-						height: 72,
-						margin: '0 auto 20px',
-						borderRadius: 9999,
-						background: 'var(--accent-bg)',
-						display: 'flex',
-						alignItems: 'center',
-						justifyContent: 'center',
-						color: 'var(--accent)',
-					}}
-				>
-					<svg width="36" height="36" viewBox="0 0 24 24" fill="none" aria-hidden>
-						<path
-							stroke="currentColor"
-							strokeWidth="1.7"
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							d="M15.59 14.37a6 6 0 0 1-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 0 0 6.16-12.12A14.98 14.98 0 0 0 9.63 8.41m5.95 5.95a14.93 14.93 0 0 1-5.84 2.58m-.12-8.54a6 6 0 0 0-7.38 5.84h4.8m2.58-5.84a14.93 14.93 0 0 0-2.58 5.84m2.7 2.7a12.1 12.1 0 0 1-2.63 0 6.01 6.01 0 0 1-2.3-1.06"
-						/>
-					</svg>
-				</div>
 				<h2 style={{ color: 'var(--text-primary)', fontSize: 22, fontWeight: 800, margin: '0 0 12px' }}>Ready to start?</h2>
 				<p style={{ color: 'var(--text-secondary)', fontSize: 15, lineHeight: 1.6, margin: '0 0 28px' }}>
 					Make sure you have a stable internet connection. The quiz will begin immediately after you click the button below.
@@ -1154,39 +1107,23 @@ function CourseQuizPreview({ courseId, moduleIndex, quiz, attempts, moduleDescri
 	);
 }
 
-function PreviewStatCard({ tint, iconColor, label, value, valueMuted, icon }) {
+function PreviewStatCard({ label, value, valueMuted, icon }) {
 	return (
-		<div
-			className="card"
-			style={{
-				padding: 16,
-				display: 'flex',
-				alignItems: 'flex-start',
-				gap: 12,
-				boxShadow: 'var(--shadow-card)',
-				background: 'var(--bg-surface)',
-			}}
-		>
-			<div
-				style={{
-					width: 44,
-					height: 44,
-					borderRadius: 9999,
-					background: tint,
-					color: iconColor,
-					display: 'flex',
-					alignItems: 'center',
-					justifyContent: 'center',
-					flexShrink: 0,
-				}}
-			>
-				{icon}
+		<article className="card card-elevated-surface instructor-dashboard-stat-card course-quiz-preview-stat-card">
+			<div className="course-quiz-preview-stat-card__row">
+				<div className="dashboard-stat-icon" aria-hidden>
+					{icon}
+				</div>
+				<div className="course-quiz-preview-stat-card__text">
+					<span className="course-quiz-preview-stat-card__label">{label}</span>
+					<strong
+						className={`course-quiz-preview-stat-card__value${valueMuted ? ' is-muted' : ''}`}
+					>
+						{value}
+					</strong>
+				</div>
 			</div>
-			<div>
-				<div style={{ color: 'var(--text-muted)', fontSize: 12, fontWeight: 500, marginBottom: 2 }}>{label}</div>
-				<div style={{ color: valueMuted ? 'var(--text-muted)' : 'var(--text-primary)', fontSize: 18, fontWeight: 700, lineHeight: 1.2 }}>{value}</div>
-			</div>
-		</div>
+		</article>
 	);
 }
 
