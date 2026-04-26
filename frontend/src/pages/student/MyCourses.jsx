@@ -541,15 +541,12 @@ const MyCourses = () => {
 				width: '100%',
 				background: 'var(--bg-primary)',
 				minHeight: 'calc(100vh - 64px)',
-				display: 'flex',
-				flexDirection: 'column',
 				fontFamily: 'var(--font)',
 			}}
 		>
 			<main
 				className="page-fade"
 				style={{
-					flex: 1,
 					width: '100%',
 					maxWidth: 1280,
 					margin: '0 auto',
@@ -647,45 +644,6 @@ const MyCourses = () => {
 
 				</div>
 			</main>
-
-			<footer
-				style={{
-					width: '100%',
-					maxWidth: 1280,
-					margin: '0 auto',
-					marginTop: 'auto',
-					padding: '32px 24px',
-					background: 'var(--bg-surface)',
-					borderTop: '1px solid var(--border)',
-					fontFamily: 'var(--font)',
-				}}
-			>
-				<div
-					style={{
-						width: '100%',
-						maxWidth: 1440,
-						margin: '0 auto',
-						display: 'flex',
-						flexWrap: 'wrap',
-						justifyContent: 'space-between',
-						alignItems: 'center',
-						gap: 16,
-					}}
-				>
-					<div style={{ color: 'var(--text-muted)', fontSize: 14, lineHeight: '20px' }}>© 2026 Coursly Inc. All rights reserved.</div>
-					<div style={{ display: 'flex', flexWrap: 'wrap', gap: 24, alignItems: 'center' }}>
-						<Link to="/" style={{ color: 'var(--text-muted)', fontSize: 14, lineHeight: '20px' }}>
-							Privacy Policy
-						</Link>
-						<Link to="/" style={{ color: 'var(--text-muted)', fontSize: 14, lineHeight: '20px' }}>
-							Terms of Service
-						</Link>
-						<Link to="/courses" style={{ color: 'var(--text-muted)', fontSize: 14, lineHeight: '20px' }}>
-							Help Center
-						</Link>
-					</div>
-				</div>
-			</footer>
 		</div>
 	);
 };

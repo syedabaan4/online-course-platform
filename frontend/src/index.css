@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap');
 
 :root {
   /* Backgrounds */
@@ -680,7 +681,9 @@ a {
 .course-completed-page .btn-primary,
 .course-completed-page .btn-secondary,
 .certificate-view-page .btn-primary,
-.certificate-view-page .btn-secondary {
+.certificate-view-page .btn-secondary,
+.home-page .btn-primary,
+.home-page .btn-secondary {
   min-height: 48px;
   padding: 12px 22px;
   font-size: 14px;
@@ -691,27 +694,31 @@ a {
 
 .my-certificates-page .btn-primary,
 .course-completed-page .btn-primary,
-.certificate-view-page .btn-primary {
+.certificate-view-page .btn-primary,
+.home-page .btn-primary {
   font-weight: 700;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1), 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
 .my-certificates-page .btn-primary:hover:not(:disabled),
 .course-completed-page .btn-primary:hover:not(:disabled),
-.certificate-view-page .btn-primary:hover:not(:disabled) {
+.certificate-view-page .btn-primary:hover:not(:disabled),
+.home-page .btn-primary:hover:not(:disabled) {
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.16), 0 4px 12px rgba(0, 0, 0, 0.1);
   transform: translateY(-1px);
 }
 
 .my-certificates-page .btn-secondary,
 .course-completed-page .btn-secondary,
-.certificate-view-page .btn-secondary {
+.certificate-view-page .btn-secondary,
+.home-page .btn-secondary {
   box-shadow: var(--shadow-elevated-surface);
 }
 
 .my-certificates-page .btn-secondary:hover:not(:disabled),
 .course-completed-page .btn-secondary:hover:not(:disabled),
-.certificate-view-page .btn-secondary:hover:not(:disabled) {
+.certificate-view-page .btn-secondary:hover:not(:disabled),
+.home-page .btn-secondary:hover:not(:disabled) {
   box-shadow: var(--shadow-elevated-surface-hover);
   transform: translateY(-1px);
 }
@@ -722,9 +729,61 @@ a {
   .course-completed-page .btn-primary:hover:not(:disabled),
   .course-completed-page .btn-secondary:hover:not(:disabled),
   .certificate-view-page .btn-primary:hover:not(:disabled),
-  .certificate-view-page .btn-secondary:hover:not(:disabled) {
+  .certificate-view-page .btn-secondary:hover:not(:disabled),
+  .home-page .btn-primary:hover:not(:disabled),
+  .home-page .btn-secondary:hover:not(:disabled) {
     transform: none;
   }
+}
+
+.home-page-eyebrow {
+  margin: 0 0 12px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.home-page-title {
+  margin: 0 0 16px;
+  font-size: clamp(2rem, 6vw, 2.75rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.home-page-lead {
+  margin: 0 auto;
+  max-width: 420px;
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.home-page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.home-page-footnote {
+  margin: 24px 0 0;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.home-page-footnote-link {
+  color: var(--text-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.home-page-footnote-link:hover {
+  text-decoration: underline;
 }
 
 .certificate-view-header-actions {
@@ -1130,6 +1189,17 @@ a {
   background: var(--border);
   border: none;
   margin: 0;
+}
+
+/* App shell (navbar + routed content + footer) */
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-shell__main {
+  flex: 1 0 auto;
 }
 
 /* Navbar */
