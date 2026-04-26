@@ -296,7 +296,7 @@ const EnrollmentRowFigma = ({ enrollment, openMenuCourseId, onToggleMenu, closeM
 					alignSelf: 'flex-start',
 					aspectRatio: '256 / 172',
 					position: 'relative',
-					borderRadius: 'var(--radius-lg)',
+					borderRadius: 'var(--radius-sm)',
 					overflow: 'hidden',
 					background: 'var(--bg-elevated)',
 				}}

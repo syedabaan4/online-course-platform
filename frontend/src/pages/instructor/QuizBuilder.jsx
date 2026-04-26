@@ -386,8 +386,9 @@ const QuizBuilder = () => {
 	}
 
 	return (
-		<div className="quiz-page page-fade">
-			<header className="quiz-topbar">
+		<>
+			<div className="quiz-page page-fade">
+				<header className="quiz-topbar">
 				<div className="quiz-topbar-inner">
 					<Link
 						className="quiz-back-link"
@@ -520,7 +521,7 @@ const QuizBuilder = () => {
 										</button>
 										<button
 											type="button"
-											className="quiz-icon-trash"
+											className="quiz-question-btn quiz-icon-trash"
 											aria-label="Delete question"
 											onClick={() => handleDeleteQuestion(q)}
 										>
@@ -638,6 +639,7 @@ const QuizBuilder = () => {
 					</div>
 				</div>
 			</main>
+			</div>
 
 			{qModal.isOpen ? (
 				<div
@@ -656,7 +658,13 @@ const QuizBuilder = () => {
 						}
 					}}
 				>
-					<div className="card quiz-modal">
+					<div
+						className="card quiz-modal"
+						role="document"
+						onClick={(e) => e.stopPropagation()}
+					>
+						<div className="quiz-modal__accent" aria-hidden />
+						<div className="quiz-modal__body">
 						<h2 id="q-modal-title">{qModal.mode === 'add' ? 'Add question' : 'Edit question'}</h2>
 						<label className="label" htmlFor="q-text">
 							Question
@@ -717,6 +725,7 @@ const QuizBuilder = () => {
 								{isSavingQuestion ? 'Saving…' : qModal.mode === 'add' ? 'Save question' : 'Update question'}
 							</button>
 						</div>
+						</div>
 					</div>
 				</div>
 			) : null}
@@ -738,7 +747,13 @@ const QuizBuilder = () => {
 						}
 					}}
 				>
-					<div className="card quiz-modal" style={{ maxWidth: 640 }}>
+					<div
+						className="card quiz-modal quiz-modal--wide"
+						role="document"
+						onClick={(e) => e.stopPropagation()}
+					>
+						<div className="quiz-modal__accent" aria-hidden />
+						<div className="quiz-modal__body">
 						<h2 id="pv-title">{quiz.title}</h2>
 						<p className="quiz-hero-sub" style={{ marginTop: 8, marginBottom: 16 }}>
 							Pass mark: {quiz.passingScore}%
@@ -759,10 +774,11 @@ const QuizBuilder = () => {
 								Close
 							</button>
 						</div>
+						</div>
 					</div>
 				</div>
 			) : null}
-		</div>
+		</>
 	);
 };
 

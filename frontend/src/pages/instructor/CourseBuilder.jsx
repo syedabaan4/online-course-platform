@@ -810,8 +810,8 @@ const CourseBuilder = () => {
 					onClick={closeLectureModal}
 				>
 					<div
-						className="card"
-						style={{ width: '100%', maxWidth: '720px', borderRadius: 'var(--radius-lg)', padding: 0, overflow: 'hidden' }}
+						className="card builder-lecture-modal-card"
+						style={{ width: '100%', maxWidth: '720px', padding: 0, overflow: 'hidden' }}
 						onClick={(event) => event.stopPropagation()}
 					>
 						<div style={{ padding: '24px', borderBottom: '1px solid var(--border-light)', display: 'inline-flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
