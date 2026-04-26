@@ -4,7 +4,7 @@ A full-stack web application where instructors build structured courses (modules
 
 The project implements the three workflows defined in the course specification: student learning and enrollment, instructor authoring and course management, and quiz-based grading with certificate issuance.
 
----
+
 
 ## Table of contents
 
@@ -20,7 +20,7 @@ The project implements the three workflows defined in the course specification: 
 - [Validation, routing, and error handling](#validation-routing-and-error-handling)
 - [Team contributions](#team-contributions)
 
----
+
 
 ## Project overview
 
@@ -28,7 +28,7 @@ The project implements the three workflows defined in the course specification: 
 
 The frontend is a React single-page application that communicates with a REST API. The backend persists data in PostgreSQL via Prisma and issues JWTs for authenticated routes.
 
----
+
 
 ## Features
 
@@ -64,12 +64,12 @@ The frontend is a React single-page application that communicates with a REST AP
 - **Route guards**: protected student routes and instructor-only routes
 - Password reset / recovery is **not** implemented (credentials are managed at registration and login only)
 
----
+
 
 ## Frameworks and libraries
 
 | Area | Technology |
-|------|------------|
+|||
 | Frontend UI | **React 19** |
 | Frontend tooling | **Vite** |
 | Client routing | **React Router** |
@@ -84,7 +84,7 @@ The frontend is a React single-page application that communicates with a REST AP
 | Uploads | **multer** (local storage under `/uploads`) |
 | Certificate PDFs | **pdfkit** |
 
----
+
 
 ## Repository layout
 
@@ -98,7 +98,7 @@ online-course-platform/
 
 API route reference and additional backend notes live in [`backend/README.md`](backend/README.md).
 
----
+
 
 ## Prerequisites
 
@@ -106,7 +106,7 @@ API route reference and additional backend notes live in [`backend/README.md`](b
 - **PostgreSQL** running locally or reachable from your machine
 - A empty database (or one you are allowed to migrate) for development
 
----
+
 
 ## Local setup
 
@@ -156,14 +156,14 @@ The Vite dev server defaults to **http://localhost:5173**. Open that URL in a br
 - Confirm the browser can reach the API (no CORS errors in the console for normal flows).
 - Instructor flows require logging in as a user with the **INSTRUCTOR** role.
 
----
+
 
 ## Environment variables
 
 ### Backend (`backend/.env`)
 
 | Variable | Purpose |
-|----------|---------|
+|-||
 | `DATABASE_URL` | PostgreSQL connection string |
 | `JWT_SECRET` | Secret for signing access tokens |
 | `PORT` | Optional; defaults to `5000` |
@@ -174,7 +174,7 @@ Optional: `BASE_URL` for consistent absolute URLs in production (see backend REA
 
 The API base URL is configured in `frontend/src/api/axios.js` (defaults to `http://localhost:5000/api`). For deployment, point this at your hosted API (or introduce a `VITE_` variable and wire it through Vite’s `import.meta.env` if you prefer build-time configuration).
 
----
+
 
 ## Demo data (optional seed)
 
@@ -199,7 +199,7 @@ After seeding, example accounts include:
 
 Use these only in local development; change or remove seed credentials before any real deployment.
 
----
+
 
 ## Running in production
 
@@ -207,7 +207,7 @@ Use these only in local development; change or remove seed credentials before an
 - Run the backend with `npm start` (or a process manager) and ensure `DATABASE_URL`, `JWT_SECRET`, and file upload paths are set for your environment.
 - Configure CORS and `BASE_URL` / HTTPS as appropriate for your domain.
 
----
+
 
 ## Validation, routing, and error handling
 
@@ -217,16 +217,16 @@ Use these only in local development; change or remove seed credentials before an
 - **Loading states**: Lazy-loaded routes use a global suspense fallback; key mutations show loading/disabled controls where implemented.
 - **Destructive actions**: Confirmations are used for operations such as deleting a course or unenrolling, to reduce accidental data loss.
 
----
+
 
 ## Team contributions
 
 | Name | ID / role | Responsibilities |
-|------|-----------|------------------|
+||--||
 | Syed Abaan | 22984 - Group lead | End-to-end delivery per project specification: **Workflow 1** (catalog, enrollment, course player, progress, resources); **Workflow 2** (instructor dashboard, course CRUD, content builder, quiz authoring, publishing); **Workflow 3** (quiz attempts, grading UI, completion rules, certificates, PDF generation, public verification). Frontend structure (routing, auth context, UI consistency), backend REST design, Prisma schema and migrations, integration testing during development, and documentation. |
 
 
----
+
 
 ## License
 
