@@ -1,78 +1,91 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
 :root {
   /* Backgrounds */
-  --bg-primary: #F5F6F8;          /* page background */
-  --bg-surface: #FFFFFF;           /* cards, panels, navbar */
-  --bg-surface-alt: #F8FAFC;      /* module headers, table rows */
-  --bg-elevated: #F1F5F9;         /* inputs, icon backgrounds, badges */
+  --bg-primary: #FFFFFF;
+  /* page background */
+  --bg-surface: #FFFFFF;
+  /* cards, panels, navbar */
+  --bg-surface-alt: #FAFAFA;
+  /* module headers, table rows */
+  --bg-elevated: #F8FAFC;
+  /* inputs, icon backgrounds, badges */
 
-  /* Accent (blue) */
-  --accent: #256AF4;
-  --accent-bg: rgba(37, 106, 244, 0.10);  /* active nav */
-  --accent-badge-bg: #DBEAFE;             /* badge fill */
-  --accent-hover: #1D5BD4;
+  /* Accents based on LlamaIndex gradient */
+  --accent: #8B5CF6;
+  /* Purple */
+  --accent-gradient: linear-gradient(135deg, #38BDF8 0%, #8B5CF6 50%, #EC4899 100%);
+  --accent-bg: #F3E8FF;
+  /* active nav */
+  --accent-badge-bg: #E0E7FF;
+  /* badge fill */
+  --accent-hover: #7C3AED;
   --accent-border: color-mix(in srgb, var(--accent) 45%, var(--border));
 
   /* Text */
-  --text-primary: #0F172A;        /* headings */
-  --text-body: #334155;           /* body text, lecture titles */
-  --text-secondary: #475569;      /* descriptions, meta labels */
-  --text-muted: #64748B;          /* icons, small labels */
-  --text-dim: #94A3B8;            /* placeholders, timestamps, arrows */
-  --text-on-inverse: #FFFFFF;     /* text on dark / primary buttons */
-  --text-h: var(--text-primary); /* legacy template alias (App.css links) */
+  --text-primary: #020617;
+  /* headings (very dark) */
+  --text-body: #334155;
+  /* body text */
+  --text-secondary: #475569;
+  /* descriptions */
+  --text-muted: #64748B;
+  /* icons */
+  --text-dim: #94A3B8;
+  /* placeholders */
+  --text-on-inverse: #FFFFFF;
+  /* text on dark buttons */
+  --text-h: var(--text-primary);
 
   /* Status */
-  --success: #22C55E;
-  --success-bg: #DCFCE7;
-  --success-text: #166534;
+  --success: #10B981;
+  --success-bg: #D1FAE5;
+  --success-text: #065F46;
   --error: #EF4444;
   --error-bg: #FEE2E2;
   --error-text: #991B1B;
 
   /* Dark CTA (primary black button) */
-  --btn-inverse-bg: #171717;
-  --btn-inverse-bg-hover: #2D2D2D;
+  --btn-inverse-bg: #000000;
+  --btn-inverse-bg-hover: #1E293B;
 
   /* Borders */
   --border: #E2E8F0;
   --border-light: #F1F5F9;
 
-  /* Shadows */
-  --shadow-card: 0px 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-elevated: 0px 4px 6px -4px rgba(0, 0, 0, 0.10), 0px 10px 15px -3px rgba(0, 0, 0, 0.10);
+  /* Shadows (Softer, more expansive for premium feel) */
+  --shadow-card: 0px 4px 24px rgba(0, 0, 0, 0.04), 0px 1px 3px rgba(0, 0, 0, 0.02);
+  --shadow-elevated: 0px 8px 30px rgba(0, 0, 0, 0.06), 0px 2px 8px rgba(0, 0, 0, 0.03);
   --shadow: var(--shadow-card);
   --shadow-focus-ring: 0 0 0 3px var(--accent-bg);
   --shadow-focus-ring-inset: 0 0 0 2px var(--text-primary) inset;
-  --shadow-modal: 0 25px 50px -12px color-mix(in srgb, var(--text-primary) 25%, transparent),
-    0 0 0 1px color-mix(in srgb, var(--text-primary) 5%, transparent);
-  --shadow-elevated-accent-20: 0 4px 6px -4px color-mix(in srgb, var(--accent) 20%, transparent),
-    0 10px 15px -3px color-mix(in srgb, var(--accent) 20%, transparent);
-  --shadow-elevated-accent-30: 0 4px 6px -4px color-mix(in srgb, var(--accent) 30%, transparent),
-    0 10px 15px -3px color-mix(in srgb, var(--accent) 30%, transparent);
-  --shadow-success-glow: 0 0 10px color-mix(in srgb, var(--success) 50%, transparent);
-  --shadow-footer-up: 0 -4px 6px -1px color-mix(in srgb, var(--text-primary) 5%, transparent);
-  --shadow-subtle-elevation: 0 2px 8px color-mix(in srgb, var(--text-primary) 4%, transparent);
+  --shadow-modal: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  --shadow-elevated-accent-20: 0 4px 15px color-mix(in srgb, var(--accent) 20%, transparent);
+  --shadow-elevated-accent-30: 0 4px 15px color-mix(in srgb, var(--accent) 30%, transparent);
+  --shadow-success-glow: 0 0 15px color-mix(in srgb, var(--success) 40%, transparent);
+  --shadow-footer-up: 0 -4px 15px rgba(0, 0, 0, 0.02);
+  --shadow-subtle-elevation: 0 2px 10px rgba(0, 0, 0, 0.03);
   --shadow-accent-icon-ring: 0 0 0 1px var(--accent-badge-bg);
 
   /* Typography */
-  --font: 'Lexend', sans-serif;
+  --font: 'Inter', sans-serif;
   --font-serif-display: 'Playfair Display', Georgia, serif;
   --font-script: 'Great Vibes', cursive;
   --font-mono: ui-monospace, 'Cascadia Code', 'Segoe UI Mono', monospace;
 
-  /* Surfaces (template / marketing) */
+  /* Surfaces */
   --social-bg: var(--bg-elevated);
 
   /* Radius */
-  --radius-xs: 2px;
-  --radius-sm: 4px;
-  --radius-compact: 5px;
-  --radius-md: 6px;
-  --radius: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-2xl: 20px;
-  --radius-3xl: 24px;
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-compact: 8px;
+  --radius-md: 10px;
+  --radius: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-2xl: 32px;
+  --radius-3xl: 40px;
   --radius-pill: 9999px;
 }
 
@@ -100,6 +113,7 @@ h4 {
   color: var(--text-primary);
   font-family: var(--font);
   margin: 0;
+  letter-spacing: -0.02em;
 }
 
 p {
@@ -116,61 +130,70 @@ a {
   background: var(--btn-inverse-bg);
   color: var(--text-on-inverse);
   font-family: var(--font);
-  font-size: 16px;
-  font-weight: 600;
-  padding: 14px 32px;
-  border-radius: var(--radius);
-  border: none;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 12px 28px;
+  border-radius: var(--radius-pill);
+  border: 1px solid transparent;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  box-shadow: var(--shadow-elevated);
-  transition: background 0.15s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  letter-spacing: -0.01em;
 }
 
 .btn-primary:hover {
   background: var(--btn-inverse-bg-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
 
 .btn-primary-blue {
   background: var(--accent);
   color: var(--text-on-inverse);
   font-family: var(--font);
-  font-size: 16px;
-  font-weight: 600;
-  padding: 14px 32px;
-  border-radius: var(--radius);
+  font-size: 15px;
+  font-weight: 500;
+  padding: 12px 28px;
+  border-radius: var(--radius-pill);
   border: none;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  box-shadow: var(--shadow-elevated);
-  transition: background 0.15s ease;
+  box-shadow: 0 2px 10px color-mix(in srgb, var(--accent) 30%, transparent);
+  transition: all 0.2s ease;
+  letter-spacing: -0.01em;
 }
 
 .btn-primary-blue:hover {
   background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px color-mix(in srgb, var(--accent) 40%, transparent);
 }
 
 .btn-secondary {
   background: var(--bg-surface);
-  color: var(--text-body);
+  color: var(--text-primary);
   font-weight: 500;
-  padding: 14px 24px;
-  border-radius: var(--radius);
+  padding: 12px 28px;
+  border-radius: var(--radius-pill);
   border: 1px solid var(--border);
   cursor: pointer;
   font-family: var(--font);
-  font-size: 16px;
+  font-size: 15px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  transition: all 0.2s ease;
+  letter-spacing: -0.01em;
 }
 
 .btn-secondary:hover {
   background: var(--bg-elevated);
+  border-color: #cbd5e1;
 }
 
 .btn-danger {
@@ -245,10 +268,15 @@ a {
 /* Cards */
 .card {
   background: var(--bg-surface);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border);
   box-shadow: var(--shadow-card);
-  padding: 24px;
+  padding: 32px;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-elevated);
 }
 
 .card-sm {
@@ -256,7 +284,8 @@ a {
   border-radius: var(--radius);
   border: 1px solid var(--border);
   box-shadow: var(--shadow-card);
-  padding: 16px;
+  padding: 20px;
+  transition: all 0.3s ease;
 }
 
 /* Badges */
