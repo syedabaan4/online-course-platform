@@ -1010,17 +1010,17 @@ function CourseQuizPreview({ courseId, moduleIndex, quiz, attempts, moduleDescri
 	const sortedQuestions = [...(quiz.questions || [])].sort((a, b) => a.id - b.id);
 	const n = sortedQuestions.length;
 	const best = attempts.length ? Math.max(...attempts.map((a) => Number(a.score) || 0)) : null;
-	const bestLabel = best == null ? 'Not attempted' : `${Math.round(best * 10) / 10}%`;
+	const bestLabel = best == null ? 'NA' : `${Math.round(best * 10) / 10}%`;
 	const description =
 		(moduleDescription && String(moduleDescription).trim()) ||
 		'Test your knowledge of the material in this module. Read each question carefully and select the best answer.';
 
 	return (
 		<div
+			className="course-quiz-preview-wrap"
 			style={{
 				width: '100%',
 				maxWidth: 1024,
-				padding: '32px 32px 64px',
 				margin: '0 auto',
 				boxSizing: 'border-box',
 			}}
@@ -1037,43 +1037,30 @@ function CourseQuizPreview({ courseId, moduleIndex, quiz, attempts, moduleDescri
 			<h1 style={{ color: 'var(--text-primary)', fontSize: 32, fontWeight: 800, lineHeight: 1.2, margin: '0 0 12px' }}>{quiz.title}</h1>
 			<p style={{ color: 'var(--text-secondary)', fontSize: 16, lineHeight: 1.6, margin: '0 0 32px', maxWidth: 720 }}>{description}</p>
 
-			<div
-				style={{
-					display: 'grid',
-					gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-					gap: 16,
-					marginBottom: 32,
-				}}
-			>
+			<div className="course-quiz-preview-stats">
 				<PreviewStatCard
-					tint="var(--accent-bg)"
-					iconColor="var(--accent)"
 					label="Questions"
 					value={String(n)}
 					icon={
-						<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden>
+						<svg viewBox="0 0 24 24" aria-hidden>
 							<path fill="currentColor" d="M4 6h2v12H4V6zm4 0h2v7H8V6zm4 0h2v10h-2V6zm4 0h2v4h-2V6z" />
 						</svg>
 					}
 				/>
 				<PreviewStatCard
-					tint="color-mix(in srgb, var(--success) 15%, var(--bg-surface))"
-					iconColor="var(--success)"
 					label="Passing score"
 					value={`${quiz.passingScore}%`}
 					icon={
-						<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden>
+						<svg viewBox="0 0 24 24" aria-hidden>
 							<path fill="currentColor" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" />
 						</svg>
 					}
 				/>
 				<PreviewStatCard
-					tint="var(--bg-elevated)"
-					iconColor="var(--text-secondary)"
 					label="Attempts"
 					value="Unlimited"
 					icon={
-						<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden>
+						<svg viewBox="0 0 24 24" aria-hidden>
 							<path
 								fill="currentColor"
 								d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"
@@ -1082,13 +1069,11 @@ function CourseQuizPreview({ courseId, moduleIndex, quiz, attempts, moduleDescri
 					}
 				/>
 				<PreviewStatCard
-					tint="var(--bg-elevated)"
-					iconColor="var(--text-body)"
 					label="Best score"
 					value={bestLabel}
 					valueMuted={!attempts.length}
 					icon={
-						<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden>
+						<svg viewBox="0 0 24 24" aria-hidden>
 							<path fill="currentColor" d="M5 16L3 5l5.5 3L12 3l3.5 2L21 3l-2 11H5zm0 0v2h14v-2H5z" />
 						</svg>
 					}
@@ -1099,34 +1084,11 @@ function CourseQuizPreview({ courseId, moduleIndex, quiz, attempts, moduleDescri
 				className="card course-quiz-preview-card"
 				style={{
 					textAlign: 'center',
-					padding: '40px 32px 32px',
+					padding: '28px 24px 28px',
 					maxWidth: 560,
 					margin: '0 auto',
 				}}
 			>
-				<div
-					style={{
-						width: 72,
-						height: 72,
-						margin: '0 auto 20px',
-						borderRadius: 'var(--radius-pill)',
-						background: 'var(--accent-bg)',
-						display: 'flex',
-						alignItems: 'center',
-						justifyContent: 'center',
-						color: 'var(--accent)',
-					}}
-				>
-					<svg width="36" height="36" viewBox="0 0 24 24" fill="none" aria-hidden>
-						<path
-							stroke="currentColor"
-							strokeWidth="1.7"
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							d="M15.59 14.37a6 6 0 0 1-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 0 0 6.16-12.12A14.98 14.98 0 0 0 9.63 8.41m5.95 5.95a14.93 14.93 0 0 1-5.84 2.58m-.12-8.54a6 6 0 0 0-7.38 5.84h4.8m2.58-5.84a14.93 14.93 0 0 0-2.58 5.84m2.7 2.7a12.1 12.1 0 0 1-2.63 0 6.01 6.01 0 0 1-2.3-1.06"
-						/>
-					</svg>
-				</div>
 				<h2 style={{ color: 'var(--text-primary)', fontSize: 22, fontWeight: 800, margin: '0 0 12px' }}>Ready to start?</h2>
 				<p style={{ color: 'var(--text-secondary)', fontSize: 15, lineHeight: 1.6, margin: '0 0 28px' }}>
 					Make sure you have a stable internet connection. The quiz will begin immediately after you click the button below.
@@ -1145,38 +1107,23 @@ function CourseQuizPreview({ courseId, moduleIndex, quiz, attempts, moduleDescri
 	);
 }
 
-function PreviewStatCard({ tint, iconColor, label, value, valueMuted, icon }) {
+function PreviewStatCard({ label, value, valueMuted, icon }) {
 	return (
-		<div
-			className="card course-quiz-preview-card"
-			style={{
-				padding: 16,
-				display: 'flex',
-				alignItems: 'flex-start',
-				gap: 12,
-				background: 'var(--bg-surface)',
-			}}
-		>
-			<div
-				style={{
-					width: 44,
-					height: 44,
-					borderRadius: 'var(--radius-pill)',
-					background: tint,
-					color: iconColor,
-					display: 'flex',
-					alignItems: 'center',
-					justifyContent: 'center',
-					flexShrink: 0,
-				}}
-			>
-				{icon}
+		<article className="card card-elevated-surface instructor-dashboard-stat-card course-quiz-preview-stat-card">
+			<div className="course-quiz-preview-stat-card__row">
+				<div className="dashboard-stat-icon" aria-hidden>
+					{icon}
+				</div>
+				<div className="course-quiz-preview-stat-card__text">
+					<span className="course-quiz-preview-stat-card__label">{label}</span>
+					<strong
+						className={`course-quiz-preview-stat-card__value${valueMuted ? ' is-muted' : ''}`}
+					>
+						{value}
+					</strong>
+				</div>
 			</div>
-			<div>
-				<div style={{ color: 'var(--text-muted)', fontSize: 12, fontWeight: 500, marginBottom: 2 }}>{label}</div>
-				<div style={{ color: valueMuted ? 'var(--text-muted)' : 'var(--text-primary)', fontSize: 18, fontWeight: 700, lineHeight: 1.2 }}>{value}</div>
-			</div>
-		</div>
+		</article>
 	);
 }
 

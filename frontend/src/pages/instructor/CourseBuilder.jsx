@@ -514,8 +514,9 @@ const CourseBuilder = () => {
 	}
 
 	return (
-		<main className="course-builder-page page-fade">
-			<div className="course-builder-shell">
+		<>
+			<main className="course-builder-page page-fade">
+				<div className="course-builder-shell">
 				<header className="builder-header-row">
 					<div className="builder-title-area">
 						<div className="builder-breadcrumbs">
@@ -793,7 +794,8 @@ const CourseBuilder = () => {
 				</footer>
 
 				{pageError ? <div className="builder-error-text">{pageError}</div> : null}
-			</div>
+				</div>
+			</main>
 
 			{lectureModalState.isOpen ? (
 				<div
@@ -1041,7 +1043,7 @@ const CourseBuilder = () => {
 					isLoading={false}
 				/>
 			) : null}
-		</main>
+		</>
 	);
 };
 
