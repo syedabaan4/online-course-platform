@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { getMyEnrollments, unenrollFromCourse } from '../../api/enrollment.api';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -75,9 +76,58 @@ const MoreIcon = () => (
 	</svg>
 );
 
+function UnenrollConfirmModal({ courseTitle, isSubmitting, onCancel, onConfirm }) {
+	const handleBackdropClick = () => {
+		if (!isSubmitting) {
+			onCancel();
+		}
+	};
+
+	return (
+		<div
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="my-courses-unenroll-title"
+			onClick={handleBackdropClick}
+			className="my-courses-unenroll-modal-backdrop"
+		>
+			<div
+				role="presentation"
+				onClick={(e) => e.stopPropagation()}
+				className="card my-courses-unenroll-modal"
+			>
+				<div className="my-courses-unenroll-modal__icon" aria-hidden>
+					<svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+						<path
+							d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 5h2v6h-2V7zm0 8h2v2h-2v-2z"
+							fill="currentColor"
+						/>
+					</svg>
+				</div>
+				<h2 id="my-courses-unenroll-title" className="my-courses-unenroll-modal__title">
+					Unenroll from this course?
+				</h2>
+				<p className="my-courses-unenroll-modal__body">
+					You will be removed from <strong className="my-courses-unenroll-modal__course">{courseTitle}</strong>. You can enroll
+					again anytime from the course page.
+				</p>
+				<div className="my-courses-unenroll-modal__actions">
+					<button type="button" className="btn-secondary btn-sm my-courses-unenroll-modal__btn" onClick={onCancel} disabled={isSubmitting}>
+						Cancel
+					</button>
+					<button type="button" className="btn-danger btn-sm my-courses-unenroll-modal__btn" onClick={onConfirm} disabled={isSubmitting}>
+						{isSubmitting ? 'Unenrolling…' : 'Unenroll'}
+					</button>
+				</div>
+			</div>
+		</div>
+	);
+}
+
 const CourseCardMenu = ({ courseId, courseTitle, isOpen, onToggle, onClose, onUnenrolled, onError }) => {
 	const wrapRef = useRef(null);
 	const [unenrolling, setUnenrolling] = useState(false);
+	const [confirmOpen, setConfirmOpen] = useState(false);
 
 	useEffect(() => {
 		if (!isOpen) {
@@ -101,22 +151,40 @@ const CourseCardMenu = ({ courseId, courseTitle, isOpen, onToggle, onClose, onUn
 		};
 	}, [isOpen, onClose]);
 
-	const handleUnenroll = async () => {
+	useEffect(() => {
+		if (!confirmOpen) {
+			return undefined;
+		}
+		const onKey = (e) => {
+			if (e.key === 'Escape' && !unenrolling) {
+				setConfirmOpen(false);
+			}
+		};
+		document.addEventListener('keydown', onKey);
+		return () => document.removeEventListener('keydown', onKey);
+	}, [confirmOpen, unenrolling]);
+
+	const openUnenrollConfirm = () => {
+		onClose();
+		setConfirmOpen(true);
+	};
+
+	const closeUnenrollConfirm = () => {
 		if (unenrolling) {
 			return;
 		}
-		if (
-			!window.confirm(
-				`Unenroll from “${courseTitle}”? You can enroll again from the course page later.`
-			)
-		) {
+		setConfirmOpen(false);
+	};
+
+	const runUnenroll = async () => {
+		if (unenrolling) {
 			return;
 		}
 		setUnenrolling(true);
 		onError('');
 		try {
 			await unenrollFromCourse(courseId);
-			onClose();
+			setConfirmOpen(false);
 			onUnenrolled();
 		} catch (err) {
 			onError(typeof err === 'string' ? err : 'Failed to unenroll. Please try again.');
@@ -126,32 +194,45 @@ const CourseCardMenu = ({ courseId, courseTitle, isOpen, onToggle, onClose, onUn
 	};
 
 	return (
-		<div ref={wrapRef} className="my-courses-card-menu">
-			<button
-				type="button"
-				className="my-courses-card-menu__trigger"
-				aria-label="Course options"
-				aria-expanded={isOpen}
-				aria-haspopup="true"
-				onClick={() => onToggle()}
-				disabled={unenrolling}
-			>
-				<MoreIcon />
-			</button>
-			{isOpen ? (
-				<div className="my-courses-card-menu__dropdown" role="menu" aria-label="Course actions">
-					<button
-						type="button"
-						className="my-courses-card-menu__item my-courses-card-menu__item--danger"
-						role="menuitem"
-						onClick={handleUnenroll}
-						disabled={unenrolling}
-					>
-						{unenrolling ? 'Unenrolling…' : 'Unenroll from course'}
-					</button>
-				</div>
-			) : null}
-		</div>
+		<>
+			<div ref={wrapRef} className="my-courses-card-menu">
+				<button
+					type="button"
+					className="my-courses-card-menu__trigger"
+					aria-label="Course options"
+					aria-expanded={isOpen}
+					aria-haspopup="true"
+					onClick={() => onToggle()}
+					disabled={unenrolling}
+				>
+					<MoreIcon />
+				</button>
+				{isOpen ? (
+					<div className="my-courses-card-menu__dropdown" role="menu" aria-label="Course actions">
+						<button
+							type="button"
+							className="my-courses-card-menu__item my-courses-card-menu__item--danger"
+							role="menuitem"
+							onClick={openUnenrollConfirm}
+							disabled={unenrolling}
+						>
+							Unenroll from course
+						</button>
+					</div>
+				) : null}
+			</div>
+			{confirmOpen
+				? createPortal(
+						<UnenrollConfirmModal
+							courseTitle={courseTitle}
+							isSubmitting={unenrolling}
+							onCancel={closeUnenrollConfirm}
+							onConfirm={runUnenroll}
+						/>,
+						document.body
+					)
+				: null}
+		</>
 	);
 };
 

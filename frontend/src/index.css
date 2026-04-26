@@ -299,7 +299,7 @@ a {
   min-width: 0;
   width: max-content;
   max-width: min(320px, calc(100vw - 48px));
-  padding: 2px 0;
+  padding: 4px 0;
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -308,15 +308,17 @@ a {
 }
 
 .my-courses-card-menu__item {
-  display: block;
+  display: flex;
+  align-items: center;
   width: 100%;
   text-align: left;
   border: none;
   background: transparent;
   font-family: var(--font);
   font-size: 14px;
-  line-height: 1.3;
-  padding: 6px 10px;
+  line-height: 1.4;
+  padding: 10px 14px;
+  min-height: 40px;
   cursor: pointer;
   color: var(--text-body);
   white-space: nowrap;
@@ -339,6 +341,92 @@ a {
 
 .my-courses-card-menu__item--danger:hover:not(:disabled) {
   background: color-mix(in srgb, var(--error, #b91c1c) 8%, var(--bg-surface));
+}
+
+.my-courses-unenroll-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0;
+  background: color-mix(in srgb, var(--text-primary) 8%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  font-family: var(--font);
+}
+
+.my-courses-unenroll-modal {
+  max-width: 440px;
+  width: 100%;
+  margin: 0;
+  border-radius: var(--radius-3xl);
+  box-shadow: var(--shadow-elevated);
+  text-align: center;
+}
+
+.my-courses-unenroll-modal__icon {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-pill);
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--error, #b91c1c);
+  background: color-mix(in srgb, var(--error, #b91c1c) 10%, var(--bg-surface));
+}
+
+.my-courses-unenroll-modal__title {
+  margin: 0 0 12px;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.25;
+  color: var(--text-primary);
+}
+
+.my-courses-unenroll-modal__body {
+  margin: 0 0 24px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.my-courses-unenroll-modal__course {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.my-courses-unenroll-modal__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.my-courses-unenroll-modal__btn {
+  flex: 0 0 auto;
+  min-width: 148px;
+  padding: 10px 24px;
+  min-height: 40px;
+  line-height: 1.2;
+  font-size: 14px;
+  font-weight: 600;
+  box-sizing: border-box;
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: -0.01em;
+  gap: 0;
 }
 
 /* Form elements */
@@ -404,6 +492,23 @@ a {
 
 .card:hover {
   box-shadow: var(--shadow-elevated);
+}
+
+.card.course-quiz-preview-card {
+  border: none;
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.card.course-quiz-preview-card:hover {
+  box-shadow: 0 12px 44px rgba(0, 0, 0, 0.12), 0 4px 14px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card.course-quiz-preview-card:hover {
+    transform: none;
+  }
 }
 
 .course-card {
