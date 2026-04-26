@@ -49,6 +49,9 @@
   --btn-inverse-bg: #000000;
   --btn-inverse-bg-hover: #1E293B;
 
+  /* Brand (navbar logo period) */
+  --brand-rose: #e11d48;
+
   /* Borders */
   --border: #E2E8F0;
   --border-light: #F1F5F9;
@@ -424,7 +427,7 @@ a {
 }
 
 .navbar-logo__period {
-  color: #e11d48;
+  color: var(--brand-rose);
   font-weight: 800;
 }
 
@@ -509,4 +512,32 @@ a {
 
 .navbar-user-menu__item:hover {
   background: var(--bg-elevated);
+}
+
+/* Auth pages (login / register) */
+.auth-page-brand {
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 32px;
+  color: var(--text-primary);
+}
+
+.auth-page .input:focus,
+.auth-page .input:focus-visible,
+.auth-page .select:focus,
+.auth-page .select:focus-visible {
+  border-color: var(--text-dim);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--text-primary) 10%, transparent);
+}
+
+.auth-page a.auth-form-cross-link {
+  color: var(--text-primary);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.auth-page a.auth-form-cross-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
