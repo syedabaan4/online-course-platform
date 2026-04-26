@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { getCertificateById, getCertificateDownloadUrl } from '../../api/certificate.api';
+import { showError, showSuccess } from '../../components/Toast';
 
 const normalizePayload = (payload) => payload?.data ?? payload;
 
@@ -48,14 +49,27 @@ const CertificateView = () => {
 
 	const downloadHref = cert ? getCertificateDownloadUrl(cert.certificateId) : '#';
 
+	const handleCopyVerifyLink = async () => {
+		if (!cert?.certificateId || typeof window === 'undefined') {
+			return;
+		}
+		const url = `${window.location.origin}/verify/${encodeURIComponent(cert.certificateId)}`;
+		try {
+			await navigator.clipboard.writeText(url);
+			showSuccess('Verification link copied to clipboard.');
+		} catch {
+			showError('Could not copy link. You can copy it from the certificate below.');
+		}
+	};
+
 	if (isLoading) {
 		return (
 			<main
-				className="page-fade"
+				className="page-fade certificate-view-page"
 				style={{
 					...font,
 					minHeight: 'calc(100vh - 64px)',
-					background: 'var(--bg-surface-alt)',
+					background: 'var(--bg-primary)',
 					display: 'flex',
 					alignItems: 'center',
 					justifyContent: 'center',
@@ -69,8 +83,8 @@ const CertificateView = () => {
 	if (loadError || !cert) {
 		return (
 			<main
-				className="page-fade"
-				style={{ ...font, minHeight: 'calc(100vh - 64px)', padding: 48, background: 'var(--bg-surface-alt)' }}
+				className="page-fade certificate-view-page"
+				style={{ ...font, minHeight: 'calc(100vh - 64px)', padding: 48, background: 'var(--bg-primary)' }}
 			>
 				<p style={{ color: 'var(--error)', marginBottom: 16 }}>{loadError || 'Certificate unavailable.'}</p>
 				<Link to="/certificates" className="btn-secondary">
@@ -90,36 +104,28 @@ const CertificateView = () => {
 
 	return (
 		<div
-			className="page-fade"
+			className="page-fade certificate-view-page"
 			style={{
 				...font,
 				minHeight: 'calc(100vh - 64px)',
-				background: 'var(--bg-surface-alt)',
-				padding: 32,
+				background: 'var(--bg-primary)',
 				boxSizing: 'border-box',
 			}}
 		>
 			<div
+				className="course-quiz-preview-wrap"
 				style={{
 					width: '100%',
 					maxWidth: 1024,
 					margin: '0 auto',
 					display: 'flex',
 					flexDirection: 'column',
-					gap: 32,
+					gap: 24,
 					alignItems: 'stretch',
+					boxSizing: 'border-box',
 				}}
 			>
-				<Link
-					to="/certificates"
-					style={{
-						fontSize: 14,
-						fontWeight: 500,
-						color: 'var(--text-muted)',
-						textDecoration: 'none',
-						alignSelf: 'flex-start',
-					}}
-				>
+				<Link to="/certificates" className="certificate-view-back-link">
 					← My Certificates
 				</Link>
 				<div
@@ -130,7 +136,7 @@ const CertificateView = () => {
 						alignItems: 'center',
 						gap: 24,
 						paddingBottom: 24,
-						borderBottom: '1px solid var(--border)',
+						borderBottom: '1px solid var(--border-light)',
 					}}
 				>
 					<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 4, minWidth: 0 }}>
@@ -172,36 +178,19 @@ const CertificateView = () => {
 							View, download, or print your official certificate of completion.
 						</p>
 					</div>
-					<a
-						href={downloadHref}
-						target="_blank"
-						rel="noreferrer"
-						className="btn-primary"
-						style={{
-							display: 'inline-flex',
-							alignItems: 'center',
-							gap: 8,
-							padding: '12px 24px',
-							textDecoration: 'none',
-							boxShadow: 'var(--shadow-elevated-accent-20)',
-						}}
-					>
-						<DownloadIcon size={16} color="var(--bg-surface)" />
-						Download PDF
-					</a>
+					<div className="certificate-view-header-actions">
+						<button type="button" className="btn-secondary" onClick={() => void handleCopyVerifyLink()}>
+							<CopyLinkIcon size={16} color="currentColor" />
+							Get Verification Link
+						</button>
+						<a href={downloadHref} target="_blank" rel="noreferrer" className="btn-primary">
+							<DownloadIcon size={16} color="var(--bg-surface)" />
+							Download PDF
+						</a>
+					</div>
 				</div>
 
-				<div
-					style={{
-						background: 'var(--bg-surface)',
-						borderRadius: 'var(--radius-lg)',
-						boxShadow: 'var(--shadow-elevated)',
-						padding: 32,
-						display: 'flex',
-						flexDirection: 'column',
-						alignItems: 'center',
-					}}
-				>
+				<div className="card card-elevated-surface course-quiz-preview-card certificate-view-print-shell">
 					<CertificateFrame
 						studentName={studentName}
 						courseTitle={courseTitle}
@@ -212,19 +201,8 @@ const CertificateView = () => {
 					/>
 				</div>
 
-				<div style={{ display: 'flex', justifyContent: 'center', paddingBottom: 32 }}>
-					<div
-						className="card"
-						style={{
-							borderRadius: 'var(--radius-pill)',
-							padding: '10px 20px 10px 16px',
-							display: 'inline-flex',
-							alignItems: 'center',
-							gap: 8,
-							boxShadow: 'var(--shadow-card)',
-							margin: 0,
-						}}
-					>
+				<div style={{ display: 'flex', justifyContent: 'center', paddingBottom: 8 }}>
+					<div className="card card-elevated-surface course-quiz-preview-card certificate-view-hint-card">
 						<InfoIcon style={{ color: 'var(--text-muted)', width: 14, height: 14, flexShrink: 0 }} />
 						<span style={{ color: 'var(--text-muted)', fontSize: 14, lineHeight: '20px' }}>Also available in: </span>
 						<Link to="/my-courses" style={{ color: 'var(--text-primary)', fontSize: 14, fontWeight: 500 }}>
@@ -514,7 +492,7 @@ function InstructorAvatar({ name }) {
 			style={{
 				width: 40,
 				height: 40,
-				borderRadius: 'var(--radius)',
+				borderRadius: 'var(--radius-sm)',
 				background: 'var(--bg-elevated)',
 				color: 'var(--text-body)',
 				display: 'flex',
@@ -550,6 +528,20 @@ function DownloadIcon({ size, color }) {
 				d="M12 3V14M7 9l5 5 5-5M4 20h16"
 				stroke={color}
 				strokeWidth="2"
+				strokeLinecap="round"
+				strokeLinejoin="round"
+			/>
+		</svg>
+	);
+}
+
+function CopyLinkIcon({ size, color }) {
+	return (
+		<svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden>
+			<path
+				d="M10 13a5 5 0 0 1 0-7l1-1a5 5 0 0 1 7 7l-1 1M14 11a5 5 0 0 1 0 7l-1 1a5 5 0 1 1-7-7l1-1"
+				stroke={color}
+				strokeWidth="1.75"
 				strokeLinecap="round"
 				strokeLinejoin="round"
 			/>

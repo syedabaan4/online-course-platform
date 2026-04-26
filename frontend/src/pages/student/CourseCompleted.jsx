@@ -117,7 +117,7 @@ const CourseCompleted = () => {
 	if (isLoading) {
 		return (
 			<main
-				className="page-fade"
+				className="page-fade course-completed-page"
 				style={{
 					...font,
 					minHeight: 'calc(100vh - 64px)',
@@ -139,7 +139,7 @@ const CourseCompleted = () => {
 	if (loadError || !course) {
 		return (
 			<main
-				className="page-fade"
+				className="page-fade course-completed-page"
 				style={{ ...font, minHeight: 'calc(100vh - 64px)', padding: 48, background: 'var(--bg-primary)' }}
 			>
 				<p style={{ color: 'var(--error)', marginBottom: 16 }}>{loadError || 'Unable to load this page.'}</p>
@@ -152,7 +152,7 @@ const CourseCompleted = () => {
 
 	return (
 		<div
-			className="page-fade"
+			className="page-fade course-completed-page"
 			style={{
 				...font,
 				minHeight: 'calc(100vh - 64px)',
@@ -162,22 +162,7 @@ const CourseCompleted = () => {
 				alignItems: 'stretch',
 			}}
 		>
-			<div
-				style={{
-					flex: 1,
-					display: 'flex',
-					alignItems: 'center',
-					justifyContent: 'center',
-					padding: '125px 16px',
-					position: 'relative',
-					overflow: 'hidden',
-					background: `
-            radial-gradient(ellipse 70% 70% at 18% 22%, color-mix(in srgb, var(--accent) 2%, transparent) 0%, transparent 50%),
-            radial-gradient(ellipse 70% 70% at 82% 78%, color-mix(in srgb, var(--accent) 2%, transparent) 0%, transparent 50%),
-            var(--bg-primary)
-          `,
-				}}
-			>
+			<div className="course-quiz-preview-wrap course-completed-layout">
 				<DecoIcon
 					aria-hidden
 					style={{ position: 'absolute', left: '8%', top: '8%', transform: 'rotate(12deg)' }}
@@ -203,62 +188,14 @@ const CourseCompleted = () => {
 					<VerifiedDeco />
 				</DecoIcon>
 
-				<div
-					style={{
-						width: '100%',
-						maxWidth: 672,
-						background: 'var(--bg-surface)',
-						borderRadius: 'var(--radius-xl)',
-						border: '1px solid var(--border-light)',
-						boxShadow: 'var(--shadow-elevated)',
-						overflow: 'hidden',
-						display: 'flex',
-						flexDirection: 'column',
-						alignItems: 'stretch',
-						position: 'relative',
-						zIndex: 1,
-					}}
-				>
-					<div style={{ height: 8, background: 'var(--text-primary)', width: '100%' }} />
-					<div
-						style={{
-							display: 'flex',
-							flexDirection: 'column',
-							alignItems: 'center',
-							padding: '48px 40px 40px',
-							gap: 12,
-						}}
-					>
-						<div style={{ position: 'relative', marginBottom: 8 }}>
-							<div
-								style={{
-									width: 96,
-									height: 96,
-									borderRadius: 'var(--radius-pill)',
-									background: 'var(--accent-bg)',
-									display: 'flex',
-									alignItems: 'center',
-									justifyContent: 'center',
-								}}
-							>
+				<div className="card card-elevated-surface course-quiz-preview-card course-completed-hero-card" style={{ position: 'relative', zIndex: 1 }}>
+					<div className="course-completed-hero-card__accent" aria-hidden />
+					<div className="course-completed-hero-card__body">
+						<div className="course-completed-hero-icon-wrap">
+							<div className="course-completed-hero-icon">
 								<GradCapIcon size={44} color="var(--text-primary)" />
 							</div>
-							<div
-								aria-hidden
-								style={{
-									position: 'absolute',
-									right: -4,
-									top: -8,
-									width: 28,
-									height: 28,
-									borderRadius: 'var(--radius-pill)',
-									background: 'var(--success)',
-									border: '4px solid var(--bg-surface)',
-									display: 'flex',
-									alignItems: 'center',
-									justifyContent: 'center',
-								}}
-							>
+							<div className="course-completed-hero-badge" aria-hidden>
 								<MiniCheck color="var(--bg-surface)" />
 							</div>
 						</div>
@@ -332,44 +269,13 @@ const CourseCompleted = () => {
 							/>
 						</div>
 
-						<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, marginTop: 24, width: '100%', maxWidth: 320 }}>
-							<button
-								type="button"
-								className="btn-primary"
-								onClick={handleGetCertificate}
-								disabled={certLoading}
-								style={{
-									width: '100%',
-									borderRadius: 'var(--radius-lg)',
-									padding: '14px 24px',
-									fontSize: 16,
-									fontWeight: 700,
-									display: 'inline-flex',
-									alignItems: 'center',
-									justifyContent: 'center',
-									gap: 8,
-									boxShadow: 'var(--shadow-elevated-accent-30)',
-								}}
-							>
+						<div className="course-completed-actions">
+							<button type="button" className="btn-primary" onClick={handleGetCertificate} disabled={certLoading}>
 								<CertificateIcon size={16} color="var(--bg-surface)" />
-								{certLoading ? '…' : 'Get Certificate'}
+								{certLoading ? '…' : 'Get certificate'}
 							</button>
-							<Link
-								to="/my-courses"
-								style={{
-									display: 'inline-flex',
-									alignItems: 'center',
-									gap: 8,
-									padding: '8px 24px',
-									borderRadius: 'var(--radius-lg)',
-									color: 'var(--text-body)',
-									fontSize: 16,
-									fontWeight: 500,
-									lineHeight: '24px',
-									textDecoration: 'none',
-								}}
-							>
-								<ArrowBackIcon size={14} color="var(--text-body)" />
+							<Link to="/my-courses" className="btn-secondary">
+								<ArrowBackIcon size={14} color="currentColor" />
 								Back to My Courses
 							</Link>
 						</div>
@@ -382,29 +288,8 @@ const CourseCompleted = () => {
 
 function StatPill({ text }) {
 	return (
-		<div
-			style={{
-				padding: '12px 16px',
-				background: 'var(--bg-surface-alt)',
-				borderRadius: 'var(--radius)',
-				border: '1px solid var(--border-light)',
-				display: 'inline-flex',
-				alignItems: 'center',
-				gap: 12,
-			}}
-		>
-			<div
-				style={{
-					width: 24,
-					height: 24,
-					borderRadius: 'var(--radius-pill)',
-					background: 'color-mix(in srgb, var(--success) 12%, var(--bg-surface))',
-					display: 'flex',
-					alignItems: 'center',
-					justifyContent: 'center',
-					flexShrink: 0,
-				}}
-			>
+		<div className="course-completed-stat-pill">
+			<div className="dashboard-stat-icon course-completed-stat-pill__icon" aria-hidden>
 				<CheckTiny color="var(--success)" />
 			</div>
 			<span style={{ color: 'var(--text-body)', fontSize: 14, fontWeight: 500, lineHeight: '20px' }}>{text}</span>
