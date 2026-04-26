@@ -182,7 +182,7 @@ async function getAllPublishedCourses(filters = {}) {
 		andClauses.push({ difficulty: filters.difficulty });
 	}
 
-	return prisma.course.findMany({
+	const rows = await prisma.course.findMany({
 		where: { AND: andClauses },
 		include: {
 			instructor: {
@@ -195,11 +195,21 @@ async function getAllPublishedCourses(filters = {}) {
 					modules: true,
 				},
 			},
+			modules: {
+				select: {
+					_count: { select: { lectures: true } },
+				},
+			},
 		},
 		orderBy: {
 			createdAt: 'desc',
 		},
 	});
+
+	return rows.map(({ modules, ...course }) => ({
+		...course,
+		lectureCount: (modules || []).reduce((sum, m) => sum + (m._count?.lectures || 0), 0),
+	}));
 }
 
 module.exports = {

@@ -49,8 +49,8 @@
   --btn-inverse-bg: #000000;
   --btn-inverse-bg-hover: #1E293B;
 
-  /* Brand (navbar logo period) */
   --brand-rose: #e11d48;
+  --rating-star: #d97706;
 
   /* Borders */
   --border: #E2E8F0;
@@ -61,6 +61,10 @@
   --shadow-elevated: 0px 8px 30px rgba(0, 0, 0, 0.06), 0px 2px 8px rgba(0, 0, 0, 0.03);
   --shadow: var(--shadow-card);
   --shadow-focus-ring: 0 0 0 3px var(--accent-bg);
+  --shadow-focus-ring-neutral:
+    0 0 3px 0 color-mix(in srgb, var(--text-primary) 8%, transparent),
+    0 0 8px 1px color-mix(in srgb, var(--text-primary) 5%, transparent),
+    0 0 20px 3px color-mix(in srgb, var(--text-primary) 2%, transparent);
   --shadow-focus-ring-inset: 0 0 0 2px var(--text-primary) inset;
   --shadow-modal: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
   --shadow-elevated-accent-20: 0 4px 15px color-mix(in srgb, var(--accent) 20%, transparent);
@@ -233,9 +237,10 @@ a {
   outline: none;
 }
 
-.input:focus {
-  border-color: var(--accent);
-  box-shadow: var(--shadow-focus-ring);
+.input:focus,
+.input:focus-visible {
+  border-color: var(--text-dim);
+  box-shadow: var(--shadow-focus-ring-neutral);
 }
 
 .label {
@@ -263,9 +268,10 @@ a {
   background-position: right 12px center;
 }
 
-.select:focus {
-  border-color: var(--accent);
-  box-shadow: var(--shadow-focus-ring);
+.select:focus,
+.select:focus-visible {
+  border-color: var(--text-dim);
+  box-shadow: var(--shadow-focus-ring-neutral);
 }
 
 /* Cards */
@@ -280,6 +286,71 @@ a {
 
 .card:hover {
   box-shadow: var(--shadow-elevated);
+}
+
+.course-card {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  background: var(--bg-surface);
+  border: none;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--text-primary) 4%, transparent),
+    0 4px 14px color-mix(in srgb, var(--text-primary) 5%, transparent);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.course-card:hover {
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--text-primary) 6%, transparent),
+    0 16px 40px color-mix(in srgb, var(--text-primary) 9%, transparent);
+  transform: translateY(-2px);
+}
+
+.course-card:focus-visible {
+  outline: 2px solid var(--text-dim);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .course-card,
+  .course-card:hover {
+    transform: none;
+  }
+}
+
+.course-detail-aside-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  background: var(--bg-surface);
+  border: none;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--text-primary) 4%, transparent),
+    0 4px 14px color-mix(in srgb, var(--text-primary) 5%, transparent);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.course-detail-aside-card:hover {
+  box-shadow: 0 2px 6px color-mix(in srgb, var(--text-primary) 6%, transparent),
+    0 16px 40px color-mix(in srgb, var(--text-primary) 9%, transparent);
+  transform: translateY(-2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .course-detail-aside-card,
+  .course-detail-aside-card:hover {
+    transform: none;
+  }
+}
+
+.card.course-detail-syllabus-module {
+  border-radius: var(--radius-sm);
 }
 
 .card-sm {
@@ -315,18 +386,21 @@ a {
 }
 
 .badge-beginner {
-  background: var(--success-bg);
-  color: var(--success-text);
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
 }
 
 .badge-intermediate {
-  background: var(--accent-badge-bg);
-  color: var(--accent);
+  background: color-mix(in srgb, var(--text-primary) 3.5%, var(--bg-surface));
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
 }
 
 .badge-advanced {
-  background: var(--error-bg);
-  color: var(--error-text);
+  background: color-mix(in srgb, var(--text-primary) 6%, var(--bg-surface));
+  color: var(--text-primary);
+  border: 1px solid color-mix(in srgb, var(--text-dim) 35%, var(--border));
 }
 
 .badge-draft {
@@ -514,21 +588,12 @@ a {
   background: var(--bg-elevated);
 }
 
-/* Auth pages (login / register) */
 .auth-page-brand {
   font-family: var(--font);
   font-weight: 700;
   font-size: 24px;
   line-height: 32px;
   color: var(--text-primary);
-}
-
-.auth-page .input:focus,
-.auth-page .input:focus-visible,
-.auth-page .select:focus,
-.auth-page .select:focus-visible {
-  border-color: var(--text-dim);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--text-primary) 10%, transparent);
 }
 
 .auth-page a.auth-form-cross-link {
@@ -540,4 +605,26 @@ a {
 .auth-page a.auth-form-cross-link:hover {
   text-decoration: underline;
   text-underline-offset: 2px;
+}
+
+.course-catalog__filters {
+  width: 100%;
+  background: var(--bg-surface);
+  border: none;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--text-primary) 4%, transparent),
+    0 4px 14px color-mix(in srgb, var(--text-primary) 5%, transparent);
+}
+
+.course-catalog__filters .input,
+.course-catalog__filters .select {
+  border-radius: var(--radius-sm);
+}
+
+.course-catalog__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(278px, 1fr));
+  gap: 24px;
+  width: 100%;
+  align-items: start;
 }

@@ -29,16 +29,13 @@ const clampProgress = (value) => {
 };
 
 const CourseCard = ({ course, showProgress = false, progress = 0 }) => {
-	const [isHovered, setIsHovered] = useState(false);
 	const [imageError, setImageError] = useState(false);
 
 	if (!course) {
 		return (
 			<div
-				className="card"
+				className="course-card"
 				style={{
-					width: '278px',
-					borderRadius: 'var(--radius-lg)',
 					padding: '20px',
 					display: 'flex',
 					justifyContent: 'center',
@@ -69,28 +66,31 @@ const CourseCard = ({ course, showProgress = false, progress = 0 }) => {
 	const displayCategory = course.category || 'General';
 	const displayRating = course.rating ?? '0.0';
 	const displayRatingsCount = course.ratingsCount ?? 0;
-	const displayDuration = course.duration || '--';
+	const lectureCountFromApi = Number(course.lectureCount);
+	const lectureCount =
+		Number.isFinite(lectureCountFromApi) && lectureCountFromApi >= 0
+			? lectureCountFromApi
+			: Array.isArray(course.modules)
+				? course.modules.reduce((sum, m) => sum + (m._count?.lectures ?? 0), 0)
+				: null;
+	const lectureCountLabel =
+		lectureCount == null
+			? '—'
+			: `${lectureCount} ${lectureCount === 1 ? 'lecture' : 'lectures'}`;
 
 	const progressValue = useMemo(() => clampProgress(progress), [progress]);
 
 	return (
-		<div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-			<Link
-				to={`/courses/${course.id}`}
-				className="card"
-				style={{
-					width: '278px',
-					borderRadius: 'var(--radius-lg)',
-					padding: 0,
-					overflow: 'hidden',
-					outline: '1px solid var(--border)',
-					outlineOffset: '-1px',
-					transform: isHovered ? 'scale(1.02)' : 'scale(1)',
-					transition: 'transform 0.2s ease',
-				}}
-				onMouseEnter={() => setIsHovered(true)}
-				onMouseLeave={() => setIsHovered(false)}
-			>
+		<div
+			style={{
+				display: 'flex',
+				flexDirection: 'column',
+				alignItems: 'stretch',
+				width: '100%',
+				minWidth: 0,
+			}}
+		>
+			<Link to={`/courses/${course.id}`} className="course-card" style={{ boxSizing: 'border-box' }}>
 				<div
 					style={{
 						alignSelf: 'stretch',
@@ -137,41 +137,21 @@ const CourseCard = ({ course, showProgress = false, progress = 0 }) => {
 
 					<div
 						style={{
-							paddingLeft: '10px',
-							paddingRight: '10px',
-							paddingTop: '4px',
-							paddingBottom: '4px',
-							left: '12px',
-							top: '12px',
 							position: 'absolute',
-							background: 'color-mix(in srgb, var(--bg-surface) 90%, transparent)',
-							boxShadow: 'var(--shadow-card)',
-							borderRadius: 'var(--radius-sm)',
-							backdropFilter: 'blur(4px)',
-							display: 'flex',
-							flexDirection: 'column',
-							justifyContent: 'flex-start',
-							alignItems: 'flex-start',
+							left: 12,
+							top: 12,
+							zIndex: 1,
 						}}
 					>
-						<div
-							className={`badge ${badgeClass}`}
-							style={{
-								padding: 0,
-								border: 'none',
-								background: 'transparent',
-								color: 'var(--text-primary)',
-							}}
-						>
-							{difficultyLabel}
-						</div>
+						<span className={`badge ${badgeClass}`}>{difficultyLabel}</span>
 					</div>
 
 					<div
 						style={{
 							padding: '8px',
-							left: '236.33px',
+							right: '12px',
 							top: '12px',
+							left: 'auto',
 							position: 'absolute',
 							opacity: 0,
 							background: 'color-mix(in srgb, var(--bg-surface) 10%, transparent)',
@@ -242,7 +222,7 @@ const CourseCard = ({ course, showProgress = false, progress = 0 }) => {
 								<svg width="14" height="13" viewBox="0 0 14 13" fill="none" aria-hidden="true">
 									<path
 										d="M7 0.5L8.73 4L12.59 4.56L9.8 7.28L10.46 11.12L7 9.3L3.54 11.12L4.2 7.28L1.41 4.56L5.27 4L7 0.5Z"
-										fill="var(--accent)"
+										fill="var(--rating-star)"
 									/>
 								</svg>
 								<div
@@ -430,7 +410,7 @@ const CourseCard = ({ course, showProgress = false, progress = 0 }) => {
 						<div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', gap: '4px' }}>
 							<svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
 								<path
-									d="M6 1C3.23858 1 1 3.23858 1 6C1 8.76142 3.23858 11 6 11C8.76142 11 11 8.76142 11 6C11 3.23858 8.76142 1 6 1ZM6.625 3.5V6.25L8.5 7.375"
+									d="M2.5 2.5H9.5M2.5 6H9.5M2.5 9.5H6.5"
 									stroke="var(--text-muted)"
 									strokeWidth="1.2"
 									strokeLinecap="round"
@@ -449,7 +429,7 @@ const CourseCard = ({ course, showProgress = false, progress = 0 }) => {
 									lineHeight: '16px',
 								}}
 							>
-								{displayDuration}
+								{lectureCountLabel}
 							</div>
 						</div>
 					</div>
@@ -459,7 +439,8 @@ const CourseCard = ({ course, showProgress = false, progress = 0 }) => {
 			{!hasCriticalData ? (
 				<div
 					style={{
-						width: '278px',
+						width: '100%',
+						minWidth: 0,
 						paddingTop: '8px',
 						color: 'var(--error)',
 						fontFamily: 'var(--font)',

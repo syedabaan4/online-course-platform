@@ -153,6 +153,17 @@ const IconPlaySmall = () => (
 	</svg>
 );
 
+const IconQuiz = () => (
+	<svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true" style={{ color: 'var(--text-dim)' }}>
+		<circle cx="2.75" cy="3.25" r="1" fill="currentColor" />
+		<path d="M5.5 3.25H13" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
+		<circle cx="2.75" cy="7.5" r="1" fill="currentColor" />
+		<path d="M5.5 7.5H12" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
+		<circle cx="2.75" cy="11.75" r="1" fill="currentColor" />
+		<path d="M5.5 11.75H11" stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" />
+	</svg>
+);
+
 const IconChevron = ({ up }) => (
 	<svg
 		width="12"
@@ -215,7 +226,7 @@ function CourseHeroImage({ thumbnailUrl }) {
 		<div
 			style={{
 				width: '100%',
-				borderRadius: 'var(--radius-lg)',
+				borderRadius: 'var(--radius-sm)',
 				overflow: 'hidden',
 				position: 'relative',
 				background: 'var(--bg-elevated)',
@@ -289,7 +300,10 @@ function CourseSyllabusSection({ modules, updatedAtLabel }) {
 			</div>
 
 			{modules.length === 0 ? (
-				<div className="empty-state" style={{ minHeight: 160, border: '1px solid var(--border)' }}>
+				<div
+					className="empty-state"
+					style={{ minHeight: 160, border: '1px solid var(--border)', borderRadius: 'var(--radius-sm)' }}
+				>
 					<p>Syllabus will appear when modules are added.</p>
 				</div>
 			) : (
@@ -297,11 +311,16 @@ function CourseSyllabusSection({ modules, updatedAtLabel }) {
 					{modules.map((mod, modIdx) => {
 						const lectures = (mod.lectures || []).sort((a, b) => (a.order || 0) - (b.order || 0));
 						const n = lectures.length;
+						const hasPublishedQuiz = mod.quiz?.isPublished;
+						const syllabusItems = [
+							...lectures.map((lec, lecIdx) => ({ kind: 'lecture', lec, lecIdx })),
+							...(hasPublishedQuiz ? [{ kind: 'quiz', quiz: mod.quiz }] : []),
+						];
 						const isOpen = openModuleId === mod.id;
 						return (
 							<div
 								key={mod.id}
-								className="card"
+								className="card course-detail-syllabus-module"
 								style={{
 									padding: 0,
 									overflow: 'hidden',
@@ -332,12 +351,12 @@ function CourseSyllabusSection({ modules, updatedAtLabel }) {
 											style={{
 												width: 32,
 												height: 32,
-												background: 'var(--accent-badge-bg)',
-												borderRadius: 'var(--radius-pill)',
+												background: 'var(--brand-rose)',
+												borderRadius: 'var(--radius-sm)',
 												display: 'flex',
 												alignItems: 'center',
 												justifyContent: 'center',
-												color: 'var(--text-primary)',
+												color: 'var(--text-on-inverse)',
 												fontSize: 14,
 												fontWeight: 700,
 											}}
@@ -357,6 +376,7 @@ function CourseSyllabusSection({ modules, updatedAtLabel }) {
 											</div>
 											<div style={{ color: 'var(--text-muted)', fontSize: 12, lineHeight: '16px' }}>
 												{n} {n === 1 ? 'Lecture' : 'Lectures'}
+												{hasPublishedQuiz ? ' · module quiz' : null}
 											</div>
 										</div>
 									</div>
@@ -364,58 +384,90 @@ function CourseSyllabusSection({ modules, updatedAtLabel }) {
 								</button>
 								{isOpen && (
 									<div style={{ borderTop: '1px solid var(--border)' }}>
-										{lectures.map((lec, lecIdx) => (
-											<div
-												key={lec.id}
-												style={{
-													padding: 16,
-													borderBottom: lecIdx < lectures.length - 1 ? '1px solid var(--border-light)' : 'none',
-													display: 'flex',
-													alignItems: 'flex-start',
-													gap: 12,
-												}}
-											>
-												<div style={{ paddingTop: 2, flexShrink: 0 }}>
-													<IconPlaySmall />
-												</div>
-												<div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
+										{syllabusItems.map((row, itemIdx) => {
+											if (row.kind === 'lecture') {
+												const { lec, lecIdx } = row;
+												return (
 													<div
+														key={lec.id}
 														style={{
-															color: 'var(--text-body)',
-															fontSize: 14,
-															fontWeight: 500,
-															lineHeight: '20px',
+															padding: 16,
+															borderBottom: itemIdx < syllabusItems.length - 1 ? '1px solid var(--border-light)' : 'none',
+															display: 'flex',
+															alignItems: 'flex-start',
+															gap: 12,
 														}}
 													>
-														Lecture {modIdx + 1}.{lecIdx + 1}: {lec.title}
-													</div>
-													{lec.description ? (
-														<div
-															style={{
-																color: 'var(--text-muted)',
-																fontSize: 12,
-																lineHeight: '16px',
-															}}
-														>
-															{lec.description}
+														<div style={{ paddingTop: 2, flexShrink: 0 }}>
+															<IconPlaySmall />
 														</div>
-													) : null}
-												</div>
+														<div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
+															<div
+																style={{
+																	color: 'var(--text-body)',
+																	fontSize: 14,
+																	fontWeight: 500,
+																	lineHeight: '20px',
+																}}
+															>
+																Lecture {modIdx + 1}.{lecIdx + 1}: {lec.title}
+															</div>
+															{lec.description ? (
+																<div
+																	style={{
+																		color: 'var(--text-muted)',
+																		fontSize: 12,
+																		lineHeight: '16px',
+																	}}
+																>
+																	{lec.description}
+																</div>
+															) : null}
+														</div>
+													</div>
+												);
+											}
+											const { quiz } = row;
+											return (
 												<div
+													key={`quiz-${quiz.id}`}
 													style={{
-														padding: '4px 8px',
-														background: 'var(--bg-elevated)',
-														borderRadius: 'var(--radius-sm)',
-														color: 'var(--text-dim)',
-														fontSize: 12,
-														fontWeight: 500,
-														flexShrink: 0,
+														padding: 16,
+														borderBottom: itemIdx < syllabusItems.length - 1 ? '1px solid var(--border-light)' : 'none',
+														display: 'flex',
+														alignItems: 'flex-start',
+														gap: 12,
 													}}
 												>
-													—
+													<div style={{ paddingTop: 2, flexShrink: 0 }} aria-hidden="true">
+														<IconQuiz />
+													</div>
+													<div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
+														<div
+															style={{
+																color: 'var(--text-body)',
+																fontSize: 14,
+																fontWeight: 500,
+																lineHeight: '20px',
+															}}
+														>
+															Module quiz: {quiz.title}
+														</div>
+														{typeof quiz.passingScore === 'number' ? (
+															<div
+																style={{
+																	color: 'var(--text-muted)',
+																	fontSize: 12,
+																	lineHeight: '16px',
+																}}
+															>
+																Passing score: {quiz.passingScore}%
+															</div>
+														) : null}
+													</div>
 												</div>
-											</div>
-										))}
+											);
+										})}
 									</div>
 								)}
 							</div>
@@ -884,7 +936,7 @@ const CourseDetail = () => {
 						gap: 24,
 					}}
 				>
-					<div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: 24 }}>
+					<div className="course-detail-aside-card">
 						<h3
 							style={{
 								margin: 0,
@@ -913,7 +965,7 @@ const CourseDetail = () => {
 						)}
 					</div>
 
-					<div className="card" style={{ display: 'flex', flexDirection: 'column', gap: 16, padding: 24 }}>
+					<div className="course-detail-aside-card">
 						<h3
 							style={{
 								margin: 0,
@@ -954,7 +1006,7 @@ function StatPill({ label, value, icon }) {
 				style={{
 					padding: 8,
 					background: 'var(--bg-elevated)',
-					borderRadius: 'var(--radius)',
+					borderRadius: 'var(--radius-sm)',
 					display: 'flex',
 					alignItems: 'center',
 					justifyContent: 'center',
