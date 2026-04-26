@@ -222,9 +222,8 @@ Use these only in local development; change or remove seed credentials before an
 ## Team contributions
 
 | Name | ID / role | Responsibilities |
-||--||
-| Syed Abaan | 22984 - Group lead | End-to-end delivery per project specification: **Workflow 1** (catalog, enrollment, course player, progress, resources); **Workflow 2** (instructor dashboard, course CRUD, content builder, quiz authoring, publishing); **Workflow 3** (quiz attempts, grading UI, completion rules, certificates, PDF generation, public verification). Frontend structure (routing, auth context, UI consistency), backend REST design, Prisma schema and migrations, integration testing during development, and documentation. |
-
+|------|-----------|------------------|
+| Syed Abaan | 22984 — Group lead | End-to-end delivery per project specification: **Workflow 1** (catalog, enrollment, course player, progress, resources); **Workflow 2** (instructor dashboard, course CRUD, content builder, quiz authoring, publishing); **Workflow 3** (quiz attempts, grading UI, completion rules, certificates, PDF generation, public verification). Frontend structure (routing, auth context, UI consistency), backend REST design, Prisma schema and migrations, integration testing during development, and documentation. |
 
 
 
