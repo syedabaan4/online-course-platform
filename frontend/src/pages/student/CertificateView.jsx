@@ -5,8 +5,6 @@ import { getCertificateById, getCertificateDownloadUrl } from '../../api/certifi
 const normalizePayload = (payload) => payload?.data ?? payload;
 
 const font = { fontFamily: 'var(--font)' };
-const playfair = "'Playfair Display', Georgia, serif";
-const greatVibes = "'Great Vibes', cursive";
 
 const CertificateView = () => {
 	const { certificateId: certificateIdParam } = useParams();
@@ -185,7 +183,7 @@ const CertificateView = () => {
 							gap: 8,
 							padding: '12px 24px',
 							textDecoration: 'none',
-							boxShadow: '0 4px 6px -4px color-mix(in srgb, var(--accent) 20%, transparent), 0 10px 15px -3px color-mix(in srgb, var(--accent) 20%, transparent)',
+							boxShadow: 'var(--shadow-elevated-accent-20)',
 						}}
 					>
 						<DownloadIcon size={16} color="var(--bg-surface)" />
@@ -196,7 +194,7 @@ const CertificateView = () => {
 				<div
 					style={{
 						background: 'var(--bg-surface)',
-						borderRadius: 12,
+						borderRadius: 'var(--radius-lg)',
 						boxShadow: 'var(--shadow-elevated)',
 						padding: 32,
 						display: 'flex',
@@ -218,7 +216,7 @@ const CertificateView = () => {
 					<div
 						className="card"
 						style={{
-							borderRadius: 9999,
+							borderRadius: 'var(--radius-pill)',
 							padding: '10px 20px 10px 16px',
 							display: 'inline-flex',
 							alignItems: 'center',
@@ -253,7 +251,7 @@ function CertificateFrame({ studentName, courseTitle, instructorName, certificat
 				minHeight: 560,
 				outline: `12px solid color-mix(in srgb, var(--accent) 20%, transparent)`,
 				outlineOffset: 0,
-				borderRadius: 4,
+				borderRadius: 'var(--radius-sm)',
 				padding: 20,
 				boxSizing: 'border-box',
 			}}
@@ -271,7 +269,7 @@ function CertificateFrame({ studentName, courseTitle, instructorName, certificat
 					pointerEvents: 'none',
 					opacity: 0.03,
 					background: `radial-gradient(ellipse 70% 70% at 50% 50%, color-mix(in srgb, var(--accent) 40%, transparent) 0%, transparent 60%)`,
-					borderRadius: 4,
+					borderRadius: 'var(--radius-sm)',
 				}}
 			/>
 
@@ -309,7 +307,7 @@ function CertificateFrame({ studentName, courseTitle, instructorName, certificat
 				<GradCapIcon style={{ width: 36, height: 34, marginBottom: 12, color: 'var(--text-primary)' }} />
 				<div
 					style={{
-						fontFamily: playfair,
+						fontFamily: 'var(--font-serif-display)',
 						color: 'var(--text-primary)',
 						fontSize: 48,
 						fontWeight: 700,
@@ -322,7 +320,7 @@ function CertificateFrame({ studentName, courseTitle, instructorName, certificat
 				</div>
 				<div
 					style={{
-						fontFamily: playfair,
+						fontFamily: 'var(--font-serif-display)',
 						color: 'var(--text-secondary)',
 						fontSize: 20,
 						fontWeight: 400,
@@ -335,12 +333,12 @@ function CertificateFrame({ studentName, courseTitle, instructorName, certificat
 				</div>
 
 				<div style={{ maxWidth: 768, marginTop: 40 }}>
-					<div style={{ fontFamily: playfair, fontStyle: 'italic', color: 'var(--text-muted)', fontSize: 18, lineHeight: '28px' }}>
+					<div style={{ fontFamily: 'var(--font-serif-display)', fontStyle: 'italic', color: 'var(--text-muted)', fontSize: 18, lineHeight: '28px' }}>
 						This is to certify that
 					</div>
 					<div
 						style={{
-							fontFamily: greatVibes,
+							fontFamily: 'var(--font-script)',
 							color: 'var(--text-primary)',
 							fontSize: 'clamp(48px, 8vw, 96px)',
 							lineHeight: 1.1,
@@ -353,7 +351,7 @@ function CertificateFrame({ studentName, courseTitle, instructorName, certificat
 					</div>
 					<div
 						style={{
-							fontFamily: playfair,
+							fontFamily: 'var(--font-serif-display)',
 							fontStyle: 'italic',
 							color: 'var(--text-muted)',
 							fontSize: 18,
@@ -417,14 +415,14 @@ function CertificateFrame({ studentName, courseTitle, instructorName, certificat
 							padding: '4px 12px',
 							background: 'color-mix(in srgb, var(--accent) 5%, var(--bg-surface))',
 							border: '1px solid color-mix(in srgb, var(--accent) 10%, var(--border))',
-							borderRadius: 4,
+							borderRadius: 'var(--radius-sm)',
 						}}
 					>
 						<span
 							style={{
 								color: 'var(--text-primary)',
 								fontSize: 12,
-								fontFamily: 'ui-monospace, monospace',
+								fontFamily: 'var(--font-mono)',
 								letterSpacing: '0.6px',
 							}}
 						>
@@ -516,7 +514,7 @@ function InstructorAvatar({ name }) {
 			style={{
 				width: 40,
 				height: 40,
-				borderRadius: 8,
+				borderRadius: 'var(--radius)',
 				background: 'var(--bg-elevated)',
 				color: 'var(--text-body)',
 				display: 'flex',

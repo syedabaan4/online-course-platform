@@ -498,7 +498,7 @@ const CoursePlayer = () => {
 						style={{
 							padding: 8,
 							background: 'var(--bg-elevated)',
-							borderRadius: 9999,
+							borderRadius: 'var(--radius-pill)',
 							display: 'flex',
 							alignItems: 'center',
 							justifyContent: 'center',
@@ -544,8 +544,8 @@ const CoursePlayer = () => {
 						>
 							{course.title}
 						</div>
-						<div className="progress-bar" style={{ width: '100%', height: 8, background: 'var(--border)', borderRadius: 9999, marginTop: 4 }}>
-							<div className="progress-fill" style={{ width: `${pct}%`, height: '100%', borderRadius: 9999 }} />
+						<div className="progress-bar" style={{ width: '100%', height: 8, background: 'var(--border)', borderRadius: 'var(--radius-pill)', marginTop: 4 }}>
+							<div className="progress-fill" style={{ width: `${pct}%`, height: '100%', borderRadius: 'var(--radius-pill)' }} />
 						</div>
 						<div style={{ color: 'var(--text-muted)', fontSize: 12, lineHeight: '16px', marginTop: 2 }}>
 							{completedN} of {totalLectures} lectures complete
@@ -637,7 +637,7 @@ const CoursePlayer = () => {
 																	style={{
 																		width: 20,
 																		height: 20,
-																		borderRadius: 9999,
+																		borderRadius: 'var(--radius-pill)',
 																		background: 'color-mix(in srgb, var(--success) 16%, var(--bg-surface))',
 																		display: 'flex',
 																		alignItems: 'center',
@@ -656,7 +656,7 @@ const CoursePlayer = () => {
 																	style={{
 																		width: 20,
 																		height: 20,
-																		borderRadius: 9999,
+																		borderRadius: 'var(--radius-pill)',
 																		background: 'var(--text-primary)',
 																		display: 'flex',
 																		alignItems: 'center',
@@ -668,7 +668,7 @@ const CoursePlayer = () => {
 																	</svg>
 																</div>
 															) : (
-																<div style={{ width: 20, height: 20, borderRadius: 9999, border: '1px solid var(--text-dim)' }} />
+																<div style={{ width: 20, height: 20, borderRadius: 'var(--radius-pill)', border: '1px solid var(--text-dim)' }} />
 															)}
 														</div>
 														<div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
@@ -730,7 +730,7 @@ const CoursePlayer = () => {
 																color: 'var(--accent)',
 																background: 'var(--bg-surface)',
 																padding: '4px 8px',
-																borderRadius: 6,
+																borderRadius: 'var(--radius-md)',
 															}}
 														>
 															Active
@@ -808,7 +808,7 @@ const CoursePlayer = () => {
 									style={{
 										display: 'block',
 										padding: 16,
-										borderRadius: 8,
+										borderRadius: 'var(--radius)',
 										background: 'var(--accent-bg)',
 										color: 'var(--accent)',
 										fontWeight: 600,
@@ -822,7 +822,7 @@ const CoursePlayer = () => {
 								<div
 									style={{
 										padding: 16,
-										borderRadius: 8,
+										borderRadius: 'var(--radius)',
 										background: 'var(--bg-elevated)',
 										color: 'var(--text-secondary)',
 										fontWeight: 500,
@@ -838,15 +838,15 @@ const CoursePlayer = () => {
 									<div style={{ color: 'var(--text-primary)', fontSize: 24, fontWeight: 700, lineHeight: '32px' }}>{activeLecture.title}</div>
 									<div style={{ color: 'var(--text-muted)', fontSize: 14, fontWeight: 500, lineHeight: '20px', whiteSpace: 'nowrap' }}>{Math.round(pct)}% Complete</div>
 								</div>
-								<div className="progress-bar" style={{ width: '100%', height: 8, background: 'var(--border)', borderRadius: 9999 }}>
-									<div className="progress-fill" style={{ width: `${pct}%`, height: '100%', borderRadius: 9999 }} />
+								<div className="progress-bar" style={{ width: '100%', height: 8, background: 'var(--border)', borderRadius: 'var(--radius-pill)' }}>
+									<div className="progress-fill" style={{ width: `${pct}%`, height: '100%', borderRadius: 'var(--radius-pill)' }} />
 								</div>
 							</div>
 
 							<div
 								style={{
 									width: '100%',
-									borderRadius: 12,
+									borderRadius: 'var(--radius-lg)',
 									overflow: 'hidden',
 									background: 'var(--text-primary)',
 									boxShadow: 'var(--shadow-elevated)',
@@ -956,7 +956,7 @@ const CoursePlayer = () => {
 														style={{
 															width: 40,
 															height: 40,
-															borderRadius: 8,
+															borderRadius: 'var(--radius)',
 															background: external ? 'var(--accent-bg)' : 'var(--bg-elevated)',
 															display: 'flex',
 															alignItems: 'center',
@@ -1118,7 +1118,7 @@ function CourseQuizPreview({ courseId, moduleIndex, quiz, attempts, moduleDescri
 						width: 72,
 						height: 72,
 						margin: '0 auto 20px',
-						borderRadius: 9999,
+						borderRadius: 'var(--radius-pill)',
 						background: 'var(--accent-bg)',
 						display: 'flex',
 						alignItems: 'center',
@@ -1171,7 +1171,7 @@ function PreviewStatCard({ tint, iconColor, label, value, valueMuted, icon }) {
 				style={{
 					width: 44,
 					height: 44,
-					borderRadius: 9999,
+					borderRadius: 'var(--radius-pill)',
 					background: tint,
 					color: iconColor,
 					display: 'flex',

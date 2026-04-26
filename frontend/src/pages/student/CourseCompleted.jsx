@@ -208,7 +208,7 @@ const CourseCompleted = () => {
 						width: '100%',
 						maxWidth: 672,
 						background: 'var(--bg-surface)',
-						borderRadius: 16,
+						borderRadius: 'var(--radius-xl)',
 						border: '1px solid var(--border-light)',
 						boxShadow: 'var(--shadow-elevated)',
 						overflow: 'hidden',
@@ -234,7 +234,7 @@ const CourseCompleted = () => {
 								style={{
 									width: 96,
 									height: 96,
-									borderRadius: 9999,
+									borderRadius: 'var(--radius-pill)',
 									background: 'var(--accent-bg)',
 									display: 'flex',
 									alignItems: 'center',
@@ -251,7 +251,7 @@ const CourseCompleted = () => {
 									top: -8,
 									width: 28,
 									height: 28,
-									borderRadius: 9999,
+									borderRadius: 'var(--radius-pill)',
 									background: 'var(--success)',
 									border: '4px solid var(--bg-surface)',
 									display: 'flex',
@@ -293,7 +293,7 @@ const CourseCompleted = () => {
 								style={{
 									height: 12,
 									background: 'var(--bg-elevated)',
-									borderRadius: 9999,
+									borderRadius: 'var(--radius-pill)',
 									overflow: 'hidden',
 									width: '100%',
 								}}
@@ -303,8 +303,8 @@ const CourseCompleted = () => {
 										width: `${progressPct}%`,
 										height: '100%',
 										background: 'var(--success)',
-										borderRadius: 9999,
-										boxShadow: '0 0 10px color-mix(in srgb, var(--success) 50%, transparent)',
+										borderRadius: 'var(--radius-pill)',
+										boxShadow: 'var(--shadow-success-glow)',
 									}}
 								/>
 							</div>
@@ -340,7 +340,7 @@ const CourseCompleted = () => {
 								disabled={certLoading}
 								style={{
 									width: '100%',
-									borderRadius: 12,
+									borderRadius: 'var(--radius-lg)',
 									padding: '14px 24px',
 									fontSize: 16,
 									fontWeight: 700,
@@ -348,7 +348,7 @@ const CourseCompleted = () => {
 									alignItems: 'center',
 									justifyContent: 'center',
 									gap: 8,
-									boxShadow: '0 4px 6px -4px color-mix(in srgb, var(--accent) 30%, transparent), 0 10px 15px -3px color-mix(in srgb, var(--accent) 30%, transparent)',
+									boxShadow: 'var(--shadow-elevated-accent-30)',
 								}}
 							>
 								<CertificateIcon size={16} color="var(--bg-surface)" />
@@ -361,7 +361,7 @@ const CourseCompleted = () => {
 									alignItems: 'center',
 									gap: 8,
 									padding: '8px 24px',
-									borderRadius: 12,
+									borderRadius: 'var(--radius-lg)',
 									color: 'var(--text-body)',
 									fontSize: 16,
 									fontWeight: 500,
@@ -386,7 +386,7 @@ function StatPill({ text }) {
 			style={{
 				padding: '12px 16px',
 				background: 'var(--bg-surface-alt)',
-				borderRadius: 8,
+				borderRadius: 'var(--radius)',
 				border: '1px solid var(--border-light)',
 				display: 'inline-flex',
 				alignItems: 'center',
@@ -397,7 +397,7 @@ function StatPill({ text }) {
 				style={{
 					width: 24,
 					height: 24,
-					borderRadius: 9999,
+					borderRadius: 'var(--radius-pill)',
 					background: 'color-mix(in srgb, var(--success) 12%, var(--bg-surface))',
 					display: 'flex',
 					alignItems: 'center',

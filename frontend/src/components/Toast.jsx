@@ -6,8 +6,8 @@ const toast = Swal.mixin({
   showConfirmButton: false,
   timer: 3000,
   timerProgressBar: true,
-  background: '#FFFFFF',
-  color: '#0F172A',
+  background: 'var(--bg-surface)',
+  color: 'var(--text-primary)',
 });
 
 export function showSuccess(message) {
@@ -23,11 +23,11 @@ export async function confirmAction(title, text) {
     title, text,
     icon: 'warning',
     showCancelButton: true,
-    confirmButtonColor: '#256AF4',
-    cancelButtonColor: '#EF4444',
+    confirmButtonColor: 'var(--accent)',
+    cancelButtonColor: 'var(--error)',
     confirmButtonText: 'Yes, do it',
-    background: '#FFFFFF',
-    color: '#0F172A',
+    background: 'var(--bg-surface)',
+    color: 'var(--text-primary)',
   });
   return result.isConfirmed;
 }

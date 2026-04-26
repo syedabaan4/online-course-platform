@@ -223,7 +223,7 @@ const InstructorDashboard = () => {
 					</section>
 
 					<section style={{ alignSelf: 'stretch', display: 'inline-flex', gap: '24px', alignItems: 'stretch' }}>
-						<article className="card" style={{ width: '100%', borderRadius: '12px', padding: '24px' }}>
+						<article className="card" style={{ width: '100%', borderRadius: 'var(--radius-lg)', padding: '24px' }}>
 							<div style={{ display: 'inline-flex', alignItems: 'center', gap: '16px' }}>
 								<div
 									className="dashboard-stat-icon"
@@ -263,7 +263,7 @@ const InstructorDashboard = () => {
 							</div>
 						</article>
 
-						<article className="card" style={{ width: '100%', borderRadius: '12px', padding: '24px' }}>
+						<article className="card" style={{ width: '100%', borderRadius: 'var(--radius-lg)', padding: '24px' }}>
 							<div style={{ display: 'inline-flex', alignItems: 'center', gap: '16px' }}>
 								<div
 									className="dashboard-stat-icon"
@@ -302,7 +302,7 @@ const InstructorDashboard = () => {
 							</div>
 						</article>
 
-						<article className="card" style={{ width: '100%', borderRadius: '12px', padding: '24px' }}>
+						<article className="card" style={{ width: '100%', borderRadius: 'var(--radius-lg)', padding: '24px' }}>
 							<div style={{ display: 'inline-flex', alignItems: 'center', gap: '16px' }}>
 								<div
 									className="dashboard-stat-icon"
@@ -350,7 +350,7 @@ const InstructorDashboard = () => {
 						style={{
 							alignSelf: 'stretch',
 							padding: 0,
-							borderRadius: '12px',
+							borderRadius: 'var(--radius-lg)',
 							overflow: 'hidden',
 							border: '1px solid var(--border)',
 						}}
@@ -434,14 +434,14 @@ const InstructorDashboard = () => {
 														<img
 															src={course.thumbnailUrl}
 															alt={course.title}
-															style={{ width: '48px', height: '48px', borderRadius: '8px', objectFit: 'cover', background: 'var(--bg-elevated)' }}
+															style={{ width: '48px', height: '48px', borderRadius: 'var(--radius)', objectFit: 'cover', background: 'var(--bg-elevated)' }}
 														/>
 													) : (
 														<div
 															style={{
 																width: '48px',
 																height: '48px',
-																borderRadius: '8px',
+																borderRadius: 'var(--radius)',
 																background: 'var(--bg-elevated)',
 																display: 'flex',
 																alignItems: 'center',

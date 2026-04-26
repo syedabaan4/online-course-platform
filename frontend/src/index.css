@@ -10,6 +10,7 @@
   --accent-bg: rgba(37, 106, 244, 0.10);  /* active nav */
   --accent-badge-bg: #DBEAFE;             /* badge fill */
   --accent-hover: #1D5BD4;
+  --accent-border: color-mix(in srgb, var(--accent) 45%, var(--border));
 
   /* Text */
   --text-primary: #0F172A;        /* headings */
@@ -17,10 +18,20 @@
   --text-secondary: #475569;      /* descriptions, meta labels */
   --text-muted: #64748B;          /* icons, small labels */
   --text-dim: #94A3B8;            /* placeholders, timestamps, arrows */
+  --text-on-inverse: #FFFFFF;     /* text on dark / primary buttons */
+  --text-h: var(--text-primary); /* legacy template alias (App.css links) */
 
   /* Status */
   --success: #22C55E;
+  --success-bg: #DCFCE7;
+  --success-text: #166534;
   --error: #EF4444;
+  --error-bg: #FEE2E2;
+  --error-text: #991B1B;
+
+  /* Dark CTA (primary black button) */
+  --btn-inverse-bg: #171717;
+  --btn-inverse-bg-hover: #2D2D2D;
 
   /* Borders */
   --border: #E2E8F0;
@@ -29,14 +40,39 @@
   /* Shadows */
   --shadow-card: 0px 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-elevated: 0px 4px 6px -4px rgba(0, 0, 0, 0.10), 0px 10px 15px -3px rgba(0, 0, 0, 0.10);
+  --shadow: var(--shadow-card);
+  --shadow-focus-ring: 0 0 0 3px var(--accent-bg);
+  --shadow-focus-ring-inset: 0 0 0 2px var(--text-primary) inset;
+  --shadow-modal: 0 25px 50px -12px color-mix(in srgb, var(--text-primary) 25%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--text-primary) 5%, transparent);
+  --shadow-elevated-accent-20: 0 4px 6px -4px color-mix(in srgb, var(--accent) 20%, transparent),
+    0 10px 15px -3px color-mix(in srgb, var(--accent) 20%, transparent);
+  --shadow-elevated-accent-30: 0 4px 6px -4px color-mix(in srgb, var(--accent) 30%, transparent),
+    0 10px 15px -3px color-mix(in srgb, var(--accent) 30%, transparent);
+  --shadow-success-glow: 0 0 10px color-mix(in srgb, var(--success) 50%, transparent);
+  --shadow-footer-up: 0 -4px 6px -1px color-mix(in srgb, var(--text-primary) 5%, transparent);
+  --shadow-subtle-elevation: 0 2px 8px color-mix(in srgb, var(--text-primary) 4%, transparent);
+  --shadow-accent-icon-ring: 0 0 0 1px var(--accent-badge-bg);
 
   /* Typography */
   --font: 'Lexend', sans-serif;
+  --font-serif-display: 'Playfair Display', Georgia, serif;
+  --font-script: 'Great Vibes', cursive;
+  --font-mono: ui-monospace, 'Cascadia Code', 'Segoe UI Mono', monospace;
+
+  /* Surfaces (template / marketing) */
+  --social-bg: var(--bg-elevated);
 
   /* Radius */
+  --radius-xs: 2px;
   --radius-sm: 4px;
+  --radius-compact: 5px;
+  --radius-md: 6px;
   --radius: 8px;
   --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-3xl: 24px;
   --radius-pill: 9999px;
 }
 
@@ -77,8 +113,8 @@ a {
 
 /* Buttons */
 .btn-primary {
-  background: #171717;
-  color: #FFFFFF;
+  background: var(--btn-inverse-bg);
+  color: var(--text-on-inverse);
   font-family: var(--font);
   font-size: 16px;
   font-weight: 600;
@@ -94,12 +130,12 @@ a {
 }
 
 .btn-primary:hover {
-  background: #2D2D2D;
+  background: var(--btn-inverse-bg-hover);
 }
 
 .btn-primary-blue {
   background: var(--accent);
-  color: #FFFFFF;
+  color: var(--text-on-inverse);
   font-family: var(--font);
   font-size: 16px;
   font-weight: 600;
@@ -119,7 +155,7 @@ a {
 }
 
 .btn-secondary {
-  background: #FFFFFF;
+  background: var(--bg-surface);
   color: var(--text-body);
   font-weight: 500;
   padding: 14px 24px;
@@ -139,7 +175,7 @@ a {
 
 .btn-danger {
   background: var(--error);
-  color: #FFFFFF;
+  color: var(--text-on-inverse);
   font-weight: 500;
   padding: 14px 24px;
   border-radius: var(--radius);
@@ -173,7 +209,7 @@ a {
 
 .input:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-bg);
+  box-shadow: var(--shadow-focus-ring);
 }
 
 .label {
@@ -203,7 +239,7 @@ a {
 
 .select:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-bg);
+  box-shadow: var(--shadow-focus-ring);
 }
 
 /* Cards */
@@ -247,8 +283,8 @@ a {
 }
 
 .badge-beginner {
-  background: #DCFCE7;
-  color: #166534;
+  background: var(--success-bg);
+  color: var(--success-text);
 }
 
 .badge-intermediate {
@@ -257,8 +293,8 @@ a {
 }
 
 .badge-advanced {
-  background: #FEE2E2;
-  color: #991B1B;
+  background: var(--error-bg);
+  color: var(--error-text);
 }
 
 .badge-draft {
@@ -267,8 +303,8 @@ a {
 }
 
 .badge-published {
-  background: #DCFCE7;
-  color: #166534;
+  background: var(--success-bg);
+  color: var(--success-text);
 }
 
 /* Utilities */
@@ -293,7 +329,7 @@ a {
   height: 28px;
   border: 3px solid var(--border);
   border-top-color: var(--accent);
-  border-radius: 50%;
+  border-radius: var(--radius-pill);
   animation: spin 0.7s linear infinite;
   display: block;
   margin: auto;

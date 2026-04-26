@@ -392,7 +392,7 @@ function InfoView({ quiz, attemptsSorted, attemptsError, totalQuestions, moduleI
 			<div
 				className="card"
 				style={{
-					borderRadius: 16,
+					borderRadius: 'var(--radius-xl)',
 					display: 'flex',
 					flexDirection: 'column',
 					gap: 16,
@@ -416,7 +416,7 @@ function InfoView({ quiz, attemptsSorted, attemptsError, totalQuestions, moduleI
 			<div
 				className="card"
 				style={{
-					borderRadius: 16,
+					borderRadius: 'var(--radius-xl)',
 					padding: 0,
 					overflow: 'hidden',
 					boxShadow: 'var(--shadow-card)',
@@ -515,7 +515,7 @@ function TakingView({
 							width: '100%',
 							padding: 24,
 							background: 'var(--bg-surface)',
-							borderRadius: 16,
+							borderRadius: 'var(--radius-xl)',
 							boxShadow: 'var(--shadow-card)',
 							border: '1px solid var(--border)',
 							display: 'flex',
@@ -566,7 +566,7 @@ function TakingView({
 						</div>
 						<div
 							className="progress-bar"
-							style={{ height: 12, alignSelf: 'stretch', background: 'var(--bg-surface-alt)', borderRadius: 9999, overflow: 'hidden' }}
+							style={{ height: 12, alignSelf: 'stretch', background: 'var(--bg-surface-alt)', borderRadius: 'var(--radius-pill)', overflow: 'hidden' }}
 						>
 							<div
 								className="progress-fill"
@@ -574,7 +574,7 @@ function TakingView({
 									width: `${progressPct}%`,
 									height: '100%',
 									background: 'var(--text-primary)',
-									borderRadius: 9999,
+									borderRadius: 'var(--radius-pill)',
 								}}
 							/>
 						</div>
@@ -612,7 +612,7 @@ function TakingView({
 					alignItems: 'center',
 					flexShrink: 0,
 					zIndex: 20,
-					boxShadow: '0 -4px 6px -1px color-mix(in srgb, var(--text-primary) 5%, transparent)',
+					boxShadow: 'var(--shadow-footer-up)',
 				}}
 			>
 				<div
@@ -664,7 +664,7 @@ function QuestionBlock({ qIndex, question, options, selectedId, isAnswered, onSe
 				width: '100%',
 				padding: 32,
 				background: 'var(--bg-surface)',
-				borderRadius: 16,
+				borderRadius: 'var(--radius-xl)',
 				boxShadow: 'var(--shadow-card)',
 				border: '1px solid var(--border)',
 				display: 'flex',
@@ -678,7 +678,7 @@ function QuestionBlock({ qIndex, question, options, selectedId, isAnswered, onSe
 						width: 32,
 						height: 32,
 						background: isAnswered ? 'var(--text-primary)' : 'var(--bg-elevated)',
-						borderRadius: 9999,
+						borderRadius: 'var(--radius-pill)',
 						display: 'flex',
 						justifyContent: 'center',
 						alignItems: 'center',
@@ -734,7 +734,7 @@ function QuestionBlock({ qIndex, question, options, selectedId, isAnswered, onSe
 								justifyContent: 'flex-start',
 								gap: selected ? 14 : 16,
 								padding: selected ? '16px 16px 16px 14px' : 16,
-								borderRadius: 12,
+								borderRadius: 'var(--radius-lg)',
 								border: `1px solid ${selected ? 'var(--text-primary)' : 'var(--border)'}`,
 								background: selected
 									? 'color-mix(in srgb, var(--accent) 5%, var(--bg-surface))'
@@ -751,12 +751,12 @@ function QuestionBlock({ qIndex, question, options, selectedId, isAnswered, onSe
 									style={{
 										width: 24,
 										height: 24,
-										borderRadius: 20,
+										borderRadius: 'var(--radius-2xl)',
 										display: 'flex',
 										alignItems: 'center',
 										justifyContent: 'center',
 										flexShrink: 0,
-										boxShadow: '0 0 0 2px var(--text-primary) inset',
+										boxShadow: 'var(--shadow-focus-ring-inset)',
 									}}
 								>
 									<div
@@ -764,7 +764,7 @@ function QuestionBlock({ qIndex, question, options, selectedId, isAnswered, onSe
 											width: 7.5,
 											height: 7.5,
 											background: 'var(--text-primary)',
-											borderRadius: 9999,
+											borderRadius: 'var(--radius-pill)',
 										}}
 									/>
 								</div>
@@ -773,7 +773,7 @@ function QuestionBlock({ qIndex, question, options, selectedId, isAnswered, onSe
 									style={{
 										width: 20,
 										height: 20,
-										borderRadius: 20,
+										borderRadius: 'var(--radius-2xl)',
 										border: '2px solid var(--border)',
 										flexShrink: 0,
 									}}
@@ -907,7 +907,7 @@ function ResultsView({
 			<div
 				className="card"
 				style={{
-					borderRadius: 12,
+					borderRadius: 'var(--radius-lg)',
 					padding: 0,
 					overflow: 'hidden',
 					boxShadow: 'var(--shadow-card)',
@@ -980,7 +980,7 @@ function ResultsView({
 								height: 16,
 								alignSelf: 'stretch',
 								background: 'var(--bg-elevated)',
-								borderRadius: 9999,
+								borderRadius: 'var(--radius-pill)',
 								overflow: 'hidden',
 								position: 'relative',
 							}}
@@ -993,7 +993,7 @@ function ResultsView({
 									width: `${Math.min(100, scoreRounded)}%`,
 									height: '100%',
 									background: passed ? 'var(--success)' : 'var(--error)',
-									borderRadius: 9999,
+									borderRadius: 'var(--radius-pill)',
 									zIndex: 0,
 								}}
 							/>
@@ -1040,7 +1040,7 @@ function ResultsView({
 								alignItems: 'center',
 								gap: 8,
 								padding: '10px 24px',
-								borderRadius: 8,
+								borderRadius: 'var(--radius)',
 								color: 'var(--text-body)',
 								fontSize: 16,
 								fontWeight: 500,
@@ -1164,7 +1164,7 @@ function PassedBanner({ moduleLabel }) {
 				style={{
 					width: 64,
 					height: 64,
-					borderRadius: 9999,
+					borderRadius: 'var(--radius-pill)',
 					background: 'color-mix(in srgb, var(--success) 12%, var(--bg-surface))',
 					display: 'flex',
 					alignItems: 'center',
@@ -1200,7 +1200,7 @@ function FailedBanner() {
 				style={{
 					width: 64,
 					height: 64,
-					borderRadius: 9999,
+					borderRadius: 'var(--radius-pill)',
 					background: 'color-mix(in srgb, var(--error) 10%, var(--bg-surface))',
 					display: 'flex',
 					alignItems: 'center',
@@ -1231,7 +1231,7 @@ function QuestionResultCard({ index, question, row }) {
 			style={{
 				padding: 24,
 				background: 'var(--bg-surface)',
-				borderRadius: 8,
+				borderRadius: 'var(--radius)',
 				border: '1px solid var(--border)',
 				display: 'inline-flex',
 				alignSelf: 'stretch',
@@ -1268,7 +1268,7 @@ function QuestionResultCard({ index, question, row }) {
 						style={{
 							padding: 12,
 							background: 'var(--bg-surface-alt)',
-							borderRadius: 4,
+							borderRadius: 'var(--radius-sm)',
 						}}
 					>
 						<div style={{ color: 'var(--text-secondary)', fontSize: 12, lineHeight: '20px' }}>
@@ -1298,7 +1298,7 @@ function AnswerRowCorrect({ text }) {
 			style={{
 				padding: 12,
 				background: 'color-mix(in srgb, var(--success) 6%, var(--bg-surface))',
-				borderRadius: 4,
+				borderRadius: 'var(--radius-sm)',
 				border: '1px solid color-mix(in srgb, var(--success) 40%, var(--border))',
 				display: 'inline-flex',
 				alignSelf: 'stretch',
@@ -1311,7 +1311,7 @@ function AnswerRowCorrect({ text }) {
 					style={{
 						width: 16,
 						height: 16,
-						borderRadius: 9999,
+						borderRadius: 'var(--radius-pill)',
 						background: 'var(--success)',
 						display: 'flex',
 						alignItems: 'center',
@@ -1333,7 +1333,7 @@ function AnswerRowWrong({ text }) {
 			style={{
 				padding: 12,
 				background: 'color-mix(in srgb, var(--error) 5%, var(--bg-surface))',
-				borderRadius: 4,
+				borderRadius: 'var(--radius-sm)',
 				border: '1px solid color-mix(in srgb, var(--error) 28%, var(--border))',
 				display: 'inline-flex',
 				alignSelf: 'stretch',
@@ -1346,7 +1346,7 @@ function AnswerRowWrong({ text }) {
 					style={{
 						width: 16,
 						height: 16,
-						borderRadius: 9999,
+						borderRadius: 'var(--radius-pill)',
 						background: 'color-mix(in srgb, var(--error) 50%, var(--bg-surface))',
 						border: '1px solid color-mix(in srgb, var(--error) 50%, var(--bg-surface))',
 						display: 'flex',
@@ -1358,7 +1358,7 @@ function AnswerRowWrong({ text }) {
 						style={{
 							width: 6,
 							height: 6,
-							borderRadius: 9999,
+							borderRadius: 'var(--radius-pill)',
 							background: 'var(--bg-surface)',
 						}}
 					/>
@@ -1376,7 +1376,7 @@ function AnswerRowCorrectLabel({ text, wrongRadio }) {
 			style={{
 				padding: 12,
 				background: 'color-mix(in srgb, var(--success) 6%, var(--bg-surface))',
-				borderRadius: 4,
+				borderRadius: 'var(--radius-sm)',
 				border: '1px solid color-mix(in srgb, var(--success) 40%, var(--border))',
 				display: 'inline-flex',
 				alignSelf: 'stretch',
@@ -1390,7 +1390,7 @@ function AnswerRowCorrectLabel({ text, wrongRadio }) {
 						style={{
 							width: 16,
 							height: 16,
-							borderRadius: 9999,
+							borderRadius: 'var(--radius-pill)',
 							border: '1px solid var(--success)',
 						}}
 					/>
@@ -1399,7 +1399,7 @@ function AnswerRowCorrectLabel({ text, wrongRadio }) {
 						style={{
 							width: 16,
 							height: 16,
-							borderRadius: 9999,
+							borderRadius: 'var(--radius-pill)',
 							background: 'var(--success)',
 						}}
 					/>
@@ -1415,7 +1415,7 @@ function Swatch({ color }) {
 	return (
 		<div
 			aria-hidden
-			style={{ width: 15, height: 15, borderRadius: 2, background: color }}
+			style={{ width: 15, height: 15, borderRadius: 'var(--radius-xs)', background: color }}
 		/>
 	);
 }
@@ -1539,7 +1539,7 @@ function SubmitModal({ answeredCount, totalQuestions, onBack, onConfirm, isSubmi
 				onClick={(e) => e.stopPropagation()}
 				className="card"
 				style={{
-					borderRadius: 24,
+					borderRadius: 'var(--radius-3xl)',
 					maxWidth: 440,
 					width: '100%',
 					padding: 40,
@@ -1590,7 +1590,7 @@ function ModalWarningIcon() {
 			style={{
 				width: 72,
 				height: 72,
-				borderRadius: 9999,
+				borderRadius: 'var(--radius-pill)',
 				display: 'flex',
 				alignItems: 'center',
 				justifyContent: 'center',

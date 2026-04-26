@@ -258,7 +258,7 @@
 }
 
 .quiz-option-code {
-	font-family: ui-monospace, 'Cascadia Code', 'Segoe UI Mono', monospace;
+	font-family: var(--font-mono);
 	font-size: 14px;
 	padding: 2px 6px;
 	background: var(--bg-surface);
@@ -305,7 +305,7 @@
 	background: color-mix(in srgb, var(--bg-surface) 80%, transparent);
 	backdrop-filter: blur(6px);
 	border: 1px solid var(--border);
-	border-radius: 16px;
+	border-radius: var(--radius-xl);
 	display: inline-flex;
 	flex-wrap: wrap;
 	gap: 10px 16px;

@@ -215,7 +215,7 @@ function CourseHeroImage({ thumbnailUrl }) {
 		<div
 			style={{
 				width: '100%',
-				borderRadius: 12,
+				borderRadius: 'var(--radius-lg)',
 				overflow: 'hidden',
 				position: 'relative',
 				background: 'var(--bg-elevated)',
@@ -333,7 +333,7 @@ function CourseSyllabusSection({ modules, updatedAtLabel }) {
 												width: 32,
 												height: 32,
 												background: 'var(--accent-badge-bg)',
-												borderRadius: 9999,
+												borderRadius: 'var(--radius-pill)',
 												display: 'flex',
 												alignItems: 'center',
 												justifyContent: 'center',
@@ -405,7 +405,7 @@ function CourseSyllabusSection({ modules, updatedAtLabel }) {
 													style={{
 														padding: '4px 8px',
 														background: 'var(--bg-elevated)',
-														borderRadius: 4,
+														borderRadius: 'var(--radius-sm)',
 														color: 'var(--text-dim)',
 														fontSize: 12,
 														fontWeight: 500,
@@ -677,7 +677,7 @@ const CourseDetail = () => {
 								style={{
 									width: 32,
 									height: 32,
-									borderRadius: 9999,
+									borderRadius: 'var(--radius-pill)',
 									overflow: 'hidden',
 									background: 'var(--bg-elevated)',
 									color: 'var(--text-primary)',
@@ -954,7 +954,7 @@ function StatPill({ label, value, icon }) {
 				style={{
 					padding: 8,
 					background: 'var(--bg-elevated)',
-					borderRadius: 8,
+					borderRadius: 'var(--radius)',
 					display: 'flex',
 					alignItems: 'center',
 					justifyContent: 'center',

@@ -214,7 +214,7 @@ const CourseForm = () => {
 					{heading}
 				</h1>
 
-				<form className="card" onSubmit={handleSubmit} style={{ padding: '32px', borderRadius: '12px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+				<form className="card" onSubmit={handleSubmit} style={{ padding: '32px', borderRadius: 'var(--radius-lg)', display: 'flex', flexDirection: 'column', gap: '24px' }}>
 					<div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
 						<label className="label" htmlFor="title" style={{ fontSize: '16px', lineHeight: '24px' }}>
 							Course Title <span style={{ color: 'var(--error)' }}>*</span>

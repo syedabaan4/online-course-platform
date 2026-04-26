@@ -162,7 +162,7 @@ function CertificateListCard({ row }) {
 					style={{
 						marginTop: 8,
 						fontSize: 12,
-						fontFamily: 'ui-monospace, monospace',
+						fontFamily: 'var(--font-mono)',
 						color: 'var(--text-secondary)',
 						letterSpacing: '0.4px',
 					}}

@@ -68,7 +68,7 @@ const Register = () => {
 					width: '100%',
 					maxWidth: '420px',
 					padding: '28px',
-					borderRadius: '12px',
+					borderRadius: 'var(--radius-lg)',
 					display: 'flex',
 					flexDirection: 'column',
 					gap: '20px',

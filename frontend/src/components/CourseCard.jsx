@@ -38,7 +38,7 @@ const CourseCard = ({ course, showProgress = false, progress = 0 }) => {
 				className="card"
 				style={{
 					width: '278px',
-					borderRadius: '12px',
+					borderRadius: 'var(--radius-lg)',
 					padding: '20px',
 					display: 'flex',
 					justifyContent: 'center',
@@ -80,7 +80,7 @@ const CourseCard = ({ course, showProgress = false, progress = 0 }) => {
 				className="card"
 				style={{
 					width: '278px',
-					borderRadius: '12px',
+					borderRadius: 'var(--radius-lg)',
 					padding: 0,
 					overflow: 'hidden',
 					outline: '1px solid var(--border)',
@@ -146,7 +146,7 @@ const CourseCard = ({ course, showProgress = false, progress = 0 }) => {
 							position: 'absolute',
 							background: 'color-mix(in srgb, var(--bg-surface) 90%, transparent)',
 							boxShadow: 'var(--shadow-card)',
-							borderRadius: '4px',
+							borderRadius: 'var(--radius-sm)',
 							backdropFilter: 'blur(4px)',
 							display: 'flex',
 							flexDirection: 'column',
@@ -175,7 +175,7 @@ const CourseCard = ({ course, showProgress = false, progress = 0 }) => {
 							position: 'absolute',
 							opacity: 0,
 							background: 'color-mix(in srgb, var(--bg-surface) 10%, transparent)',
-							borderRadius: '9999px',
+							borderRadius: 'var(--radius-pill)',
 							backdropFilter: 'blur(4px)',
 							display: 'flex',
 							flexDirection: 'column',
@@ -397,7 +397,7 @@ const CourseCard = ({ course, showProgress = false, progress = 0 }) => {
 								style={{
 									width: '24px',
 									height: '24px',
-									borderRadius: '9999px',
+									borderRadius: 'var(--radius-pill)',
 									background: 'var(--bg-elevated)',
 									color: 'var(--text-body)',
 									display: 'inline-flex',

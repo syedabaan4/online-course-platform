@@ -52,7 +52,7 @@ const CategoryPill = ({ children, style: extra }) => (
 	<div
 		style={{
 			padding: '4px 8px',
-			borderRadius: 4,
+			borderRadius: 'var(--radius-sm)',
 			fontSize: 10,
 			fontWeight: 700,
 			textTransform: 'uppercase',
@@ -153,8 +153,8 @@ const EnrollmentRowFigma = ({ enrollment }) => {
 				alignSelf: 'stretch',
 				padding: 20,
 				background: 'var(--bg-surface)',
-				boxShadow: '0 2px 8px color-mix(in srgb, var(--text-primary) 4%, transparent)',
-				borderRadius: 12,
+				boxShadow: 'var(--shadow-subtle-elevation)',
+				borderRadius: 'var(--radius-lg)',
 				outline: '1px solid var(--border-light)',
 				outlineOffset: -1,
 				display: 'flex',
@@ -182,7 +182,7 @@ const EnrollmentRowFigma = ({ enrollment }) => {
 						opacity: 0.05,
 						pointerEvents: 'none',
 						background: 'var(--success)',
-						borderRadius: 8,
+						borderRadius: 'var(--radius)',
 					}}
 				/>
 			) : null}
@@ -194,7 +194,7 @@ const EnrollmentRowFigma = ({ enrollment }) => {
 					alignSelf: 'flex-start',
 					aspectRatio: '256 / 172',
 					position: 'relative',
-					borderRadius: 8,
+					borderRadius: 'var(--radius)',
 					overflow: 'hidden',
 					background: 'var(--bg-elevated)',
 				}}
@@ -272,7 +272,7 @@ const EnrollmentRowFigma = ({ enrollment }) => {
 									alignItems: 'center',
 									gap: 4,
 									padding: '4px 8px',
-									borderRadius: 4,
+									borderRadius: 'var(--radius-sm)',
 									background: 'color-mix(in srgb, var(--success) 8%, var(--bg-surface))',
 									color: 'var(--success)',
 									width: 'fit-content',
@@ -325,7 +325,7 @@ const EnrollmentRowFigma = ({ enrollment }) => {
 						</div>
 						<div
 							className="progress-bar"
-							style={{ height: 8, background: 'var(--bg-elevated)', borderRadius: 9999 }}
+							style={{ height: 8, background: 'var(--bg-elevated)', borderRadius: 'var(--radius-pill)' }}
 						>
 							<div
 								className="progress-fill"
@@ -333,7 +333,7 @@ const EnrollmentRowFigma = ({ enrollment }) => {
 									width: `${pct}%`,
 									background: 'var(--text-primary)',
 									height: 8,
-									borderRadius: 9999,
+									borderRadius: 'var(--radius-pill)',
 								}}
 							/>
 						</div>
@@ -370,14 +370,14 @@ const EnrollmentRowFigma = ({ enrollment }) => {
 							</div>
 							<div
 								className="progress-bar"
-								style={{ height: 8, background: 'var(--bg-elevated)', borderRadius: 9999, overflow: 'hidden' }}
+								style={{ height: 8, background: 'var(--bg-elevated)', borderRadius: 'var(--radius-pill)', overflow: 'hidden' }}
 							>
 								<div
 									style={{
 										width: '100%',
 										height: 8,
 										background: 'var(--success)',
-										borderRadius: 9999,
+										borderRadius: 'var(--radius-pill)',
 									}}
 								/>
 						</div>
@@ -404,7 +404,7 @@ const EnrollmentRowFigma = ({ enrollment }) => {
 									fontWeight: 700,
 									fontSize: 14,
 									fontFamily: 'var(--font)',
-									borderRadius: 8,
+									borderRadius: 'var(--radius)',
 									border: '1px solid color-mix(in srgb, var(--success) 20%, var(--border))',
 								}}
 							>
@@ -547,7 +547,7 @@ const MyCourses = () => {
 					) : null}
 
 					{enrollments.length === 0 && !loadError ? (
-						<div className="empty-state" style={{ border: '1px solid var(--border)', borderRadius: 12, background: 'var(--bg-surface)' }}>
+						<div className="empty-state" style={{ border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)', background: 'var(--bg-surface)' }}>
 							<p style={{ color: 'var(--text-body)', fontFamily: 'var(--font)' }}>No courses yet.</p>
 							<Link to="/courses" className="btn-primary">
 								Browse Courses
