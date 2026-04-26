@@ -841,7 +841,13 @@ const CourseDetail = () => {
 										<span style={{ color: 'var(--text-body)', fontWeight: 600 }}>{Math.round(pct)}%</span>
 									</div>
 									<div className="progress-bar">
-										<div className="progress-fill" style={{ width: `${Math.min(100, Math.max(0, pct))}%` }} />
+										<div
+											className="progress-fill"
+											style={{
+												width: `${Math.min(100, Math.max(0, pct))}%`,
+												background: 'var(--text-primary)',
+											}}
+										/>
 									</div>
 								</div>
 							) : null}
