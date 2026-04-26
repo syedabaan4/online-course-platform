@@ -69,7 +69,7 @@ The frontend is a React single-page application that communicates with a REST AP
 ## Frameworks and libraries
 
 | Area | Technology |
-|||
+|------|-------------|
 | Frontend UI | **React 19** |
 | Frontend tooling | **Vite** |
 | Client routing | **React Router** |
@@ -163,7 +163,7 @@ The Vite dev server defaults to **http://localhost:5173**. Open that URL in a br
 ### Backend (`backend/.env`)
 
 | Variable | Purpose |
-|-||
+|----------|---------|
 | `DATABASE_URL` | PostgreSQL connection string |
 | `JWT_SECRET` | Secret for signing access tokens |
 | `PORT` | Optional; defaults to `5000` |
